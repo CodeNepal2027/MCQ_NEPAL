@@ -1,0 +1,44 @@
+/* ===== CONTACT PAGE ===== */
+.contact-page {
+    animation: fadeIn 0.4s ease;
+    width: 100%;
+    overflow: hidden;
+}
+
+.contact-grid-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    background: var(--bg-main-1);
+    border-radius: var(--radius-lg);
+    padding: 48px 40px;
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 40px;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1024px) {
+    .contact-grid-container {
+        grid-template-columns: 1fr 1fr;
+        gap: 32px;
+        padding: 36px 28px;
+    }
+}
+
+@media (max-width: 768px) {
+    .contact-grid-container {
+        grid-template-columns: 1fr;
+        gap: 40px;
+        padding: 28px 20px;
+        border-radius: var(--radius-md);
+    }
+}
+
+@media (max-width: 480px) {
+    .contact-grid-container {
+        padding: 20px 16px;
+        gap: 32px;
+        border-radius: var(--radius-sm);
+    }
+}
