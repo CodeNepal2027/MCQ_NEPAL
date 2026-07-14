@@ -2,40 +2,64 @@
 :root {
     /* Light Theme (Default) */
     --bg-main-1: #ffffff;
-    --bg-main-2: #f0f4f8;
-    --bg-main-3: #e8edf3;
-    --text-color-1: #1a2a3a;
-    --text-color-2: #4a5b6e;
-    --text-color-3: #6b7a8d;
-    --border-color: #dde3ea;
-    --shadow-color: rgba(0, 0, 0, 0.08);
-    --hover-bg: #f0f4f8;
-    --navbar-bg: rgba(255, 255, 255, 0.95);
+    --bg-main-2: #f8fafc;
+    --bg-main-3: #f1f4f9;
+    --text-color-1: #0a1628;
+    --text-color-2: #334155;
+    --text-color-3: #64748b;
+    --text-color-4: #94a3b8;
+    --border-color: #e2e8f0;
+    --border-light: #f1f5f9;
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04);
+    --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 12px 48px rgba(0, 0, 0, 0.08);
+    --shadow-xl: 0 24px 64px rgba(0, 0, 0, 0.12);
+    --hover-bg: #f1f5f9;
+    --navbar-bg: rgba(255, 255, 255, 0.92);
     --dropdown-bg: #ffffff;
-    --theme-icon-color: #e63946;
-    --success-color: #28a745;
-    --error-color: #dc3545;
-    --warning-color: #ffc107;
-    --info-color: #17a2b8;
-    --radius: 12px;
-    --transition: 0.3s ease;
-    --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    --theme-icon-color: #b226dc;
+    --theme-icon-hover: #9f1cb9;
+    --primary-gradient: linear-gradient(135deg, #5f136e, #9f1cb9);
+    --primary-gradient-hover: linear-gradient(135deg, #b91c1c, #5f136e);
+    --success-color: #16a34a;
+    --error-color: #5f136e;
+    --warning-color: #f59e0b;
+    --info-color: #3b82f6;
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 20px;
+    --radius-xl: 28px;
+    --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --navbar-height: 72px;
+    --mobile-navbar-height: 64px;
+    --container-padding: 24px;
+    --max-width: 1250px;
 }
 
 /* Dark Theme */
 .theme-dark {
-    --bg-main-1: #1a1a2e;
-    --bg-main-2: #16213e;
-    --bg-main-3: #0f3460;
-    --text-color-1: #e8edf3;
-    --text-color-2: #b0c0d0;
-    --text-color-3: #8a9aa8;
-    --border-color: #2a3a4e;
-    --shadow-color: rgba(0, 0, 0, 0.3);
-    --hover-bg: #2a3a4e;
-    --navbar-bg: rgba(26, 26, 46, 0.95);
-    --dropdown-bg: #1a1a2e;
-    --theme-icon-color: #ff6b7a;
+    --bg-main-1: #0f1724;
+    --bg-main-2: #1a2332;
+    --bg-main-3: #243044;
+    --text-color-1: #f1f5f9;
+    --text-color-2: #cbd5e1;
+    --text-color-3: #94a3b8;
+    --text-color-4: #64748b;
+    --border-color: #334155;
+    --border-light: #1e293b;
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 12px 48px rgba(0, 0, 0, 0.5);
+    --shadow-xl: 0 24px 64px rgba(0, 0, 0, 0.6);
+    --hover-bg: #1e293b;
+    --navbar-bg: rgba(15, 23, 36, 0.92);
+    --dropdown-bg: #1a2332;
+    --theme-icon-color: #b226dc;
+    --theme-icon-hover: #9f1cb9;
+    --primary-gradient: linear-gradient(135deg, #b226dc, #9f1cb9);
+    --primary-gradient-hover: linear-gradient(135deg, #9f1cb9, #5f136e);
 }
 
 /* ===== GLOBAL RESET & BASE ===== */
@@ -45,6 +69,8 @@
     box-sizing: border-box;
 }
 
+
+
 body {
     font-family: var(--font-family);
     background: var(--bg-main-2);
@@ -52,12 +78,17 @@ body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     transition: background-color var(--transition), color var(--transition);
+    line-height: 1.6;
+    width: 100%;
+    /* REMOVED overflow-x: hidden; - This breaks sticky positioning */
 }
 
 #root {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+    width: 100%;
+    /* REMOVED overflow-x: hidden; - This breaks sticky positioning */
 }
 
 /* ===== APP CONTAINER ===== */
@@ -67,14 +98,18 @@ body {
     flex-direction: column;
     background: var(--bg-main-2);
     transition: background-color var(--transition);
+    width: 100%;
+    /* REMOVED overflow-x: hidden; - This breaks sticky positioning */
 }
 
 .main-content {
     flex: 1;
-    max-width: 1200px;
+    max-width: var(--max-width);
     margin: 0 auto;
-    padding: 24px;
+    padding: var(--container-padding);
     width: 100%;
+    padding-top: 24px;
+    /* REMOVED overflow-x: hidden; - This breaks sticky positioning */
 }
 
 /* ===== SCROLLBAR ===== */
@@ -88,36 +123,252 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-    background: var(--border-color);
+    background: var(--text-color-4);
     border-radius: 5px;
+    transition: background var(--transition);
 }
 
 ::-webkit-scrollbar-thumb:hover {
     background: var(--text-color-3);
 }
 
-/* ===== UTILITY CLASSES ===== */
+/* ===== SELECTION ===== */
+::selection {
+    background: var(--theme-icon-color);
+    color: #ffffff;
+}
+
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
+
+/* Text Alignment */
 .text-center {
     text-align: center;
 }
+.text-left {
+    text-align: left;
+}
+.text-right {
+    text-align: right;
+}
 
+/* Margin Utilities */
 .mt-1 { margin-top: 0.25rem; }
 .mt-2 { margin-top: 0.5rem; }
 .mt-3 { margin-top: 1rem; }
 .mt-4 { margin-top: 1.5rem; }
 .mt-5 { margin-top: 2rem; }
+.mt-6 { margin-top: 3rem; }
+.mt-8 { margin-top: 4rem; }
 
 .mb-1 { margin-bottom: 0.25rem; }
 .mb-2 { margin-bottom: 0.5rem; }
 .mb-3 { margin-bottom: 1rem; }
 .mb-4 { margin-bottom: 1.5rem; }
 .mb-5 { margin-bottom: 2rem; }
+.mb-6 { margin-bottom: 3rem; }
+.mb-8 { margin-bottom: 4rem; }
 
-/* ===== ANIMATIONS ===== */
+.ml-auto { margin-left: auto; }
+.mr-auto { margin-right: auto; }
+.mx-auto { margin-left: auto; margin-right: auto; }
+
+/* Padding Utilities */
+.p-1 { padding: 0.25rem; }
+.p-2 { padding: 0.5rem; }
+.p-3 { padding: 1rem; }
+.p-4 { padding: 1.5rem; }
+.p-5 { padding: 2rem; }
+.p-6 { padding: 3rem; }
+
+/* Flex Utilities */
+.d-flex {
+    display: flex;
+}
+.flex-column {
+    flex-direction: column;
+}
+.flex-wrap {
+    flex-wrap: wrap;
+}
+.flex-nowrap {
+    flex-wrap: nowrap;
+}
+.align-center {
+    align-items: center;
+}
+.align-start {
+    align-items: flex-start;
+}
+.align-end {
+    align-items: flex-end;
+}
+.justify-center {
+    justify-content: center;
+}
+.justify-between {
+    justify-content: space-between;
+}
+.justify-around {
+    justify-content: space-around;
+}
+.gap-1 { gap: 0.25rem; }
+.gap-2 { gap: 0.5rem; }
+.gap-3 { gap: 1rem; }
+.gap-4 { gap: 1.5rem; }
+.gap-5 { gap: 2rem; }
+
+/* Width Utilities */
+.w-100 {
+    width: 100%;
+}
+.w-75 {
+    width: 75%;
+}
+.w-50 {
+    width: 50%;
+}
+.w-25 {
+    width: 25%;
+}
+.w-auto {
+    width: auto;
+}
+
+/* Overflow Utilities */
+.overflow-hidden {
+    overflow: hidden;
+}
+.overflow-visible {
+    overflow: visible;
+}
+.overflow-auto {
+    overflow: auto;
+}
+.overflow-x-hidden {
+    overflow-x: hidden;
+}
+.overflow-y-hidden {
+    overflow-y: hidden;
+}
+
+/* Position Utilities */
+.position-relative {
+    position: relative;
+}
+.position-absolute {
+    position: absolute;
+}
+.position-fixed {
+    position: fixed;
+}
+.position-sticky {
+    position: sticky;
+}
+
+/* Text Utilities */
+.text-truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.text-wrap {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: normal;
+}
+.text-break {
+    word-break: break-word;
+}
+.text-nowrap {
+    white-space: nowrap;
+}
+
+/* Display Utilities */
+.d-none {
+    display: none;
+}
+.d-block {
+    display: block;
+}
+.d-inline {
+    display: inline;
+}
+.d-inline-block {
+    display: inline-block;
+}
+
+/* Border Utilities */
+.border-none {
+    border: none;
+}
+.border-0 {
+    border: 0;
+}
+.rounded-sm {
+    border-radius: var(--radius-sm);
+}
+.rounded-md {
+    border-radius: var(--radius-md);
+}
+.rounded-lg {
+    border-radius: var(--radius-lg);
+}
+.rounded-xl {
+    border-radius: var(--radius-xl);
+}
+.rounded-full {
+    border-radius: 50%;
+}
+
+/* Shadow Utilities */
+.shadow-sm {
+    box-shadow: var(--shadow-sm);
+}
+.shadow-md {
+    box-shadow: var(--shadow-md);
+}
+.shadow-lg {
+    box-shadow: var(--shadow-lg);
+}
+.shadow-xl {
+    box-shadow: var(--shadow-xl);
+}
+.shadow-none {
+    box-shadow: none;
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+
 @keyframes fadeIn {
     from {
         opacity: 0;
-        transform: translateY(10px);
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(40px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
     }
     to {
         opacity: 1;
@@ -128,7 +379,7 @@ body {
 @keyframes slideDown {
     from {
         opacity: 0;
-        transform: translateY(-12px) scale(0.95);
+        transform: translateY(-12px) scale(0.96);
     }
     to {
         opacity: 1;
@@ -136,14 +387,224 @@ body {
     }
 }
 
-.fade-in {
-    animation: fadeIn 0.3s ease;
+@keyframes scaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
 
-/* ===== TRANSITIONS FOR THEME CHANGE ===== */
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Animation Classes */
+.fade-in {
+    animation: fadeIn 0.5s ease forwards;
+}
+.fade-in-up {
+    animation: fadeInUp 0.6s ease forwards;
+}
+.fade-in-down {
+    animation: fadeInDown 0.5s ease forwards;
+}
+.slide-in-left {
+    animation: slideInLeft 0.5s ease forwards;
+}
+.slide-in-right {
+    animation: slideInRight 0.5s ease forwards;
+}
+.scale-in {
+    animation: scaleIn 0.4s ease forwards;
+}
+
+/* Animation Delays */
+.delay-1 {
+    animation-delay: 0.1s;
+}
+.delay-2 {
+    animation-delay: 0.2s;
+}
+.delay-3 {
+    animation-delay: 0.3s;
+}
+.delay-4 {
+    animation-delay: 0.4s;
+}
+.delay-5 {
+    animation-delay: 0.5s;
+}
+
+/* ============================================
+   TRANSITIONS
+   ============================================ */
+
 * {
     transition: background-color var(--transition), 
                 color var(--transition), 
                 border-color var(--transition),
-                box-shadow var(--transition);
+                box-shadow var(--transition),
+                transform var(--transition),
+                opacity var(--transition);
+}
+
+/* ============================================
+   CONTAINER & GRID FIXES
+   ============================================ */
+
+/* Fix for grid overflow */
+.grid-container {
+    min-width: 0;
+    overflow: hidden;
+}
+
+/* Fix for flex items */
+.flex-item {
+    min-width: 0;
+    flex-shrink: 1;
+}
+
+/* Container with max-width and proper padding */
+.container-fluid {
+    width: 100%;
+    padding-right: var(--container-padding);
+    padding-left: var(--container-padding);
+    margin-right: auto;
+    margin-left: auto;
+}
+
+/* Ensure images and media don't overflow */
+img, svg, video, iframe {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* Fix for card content overflow */
+.card-content {
+    min-width: 0;
+    overflow: hidden;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 1024px) {
+    :root {
+        --container-padding: 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    :root {
+        --navbar-height: 64px;
+        --container-padding: 16px;
+    }
+
+    .main-content {
+        padding-top: 16px;
+        padding-left: var(--container-padding);
+        padding-right: var(--container-padding);
+    }
+
+    /* Hide on mobile */
+    .d-none-mobile {
+        display: none !important;
+    }
+    
+    /* Full width on mobile */
+    .w-100-mobile {
+        width: 100% !important;
+    }
+    
+    /* Stack on mobile */
+    .flex-column-mobile {
+        flex-direction: column !important;
+    }
+}
+
+@media (max-width: 480px) {
+    :root {
+        --navbar-height: 58px;
+        --container-padding: 12px;
+    }
+
+    .main-content {
+        padding: 12px;
+        padding-top: 12px;
+    }
+
+    /* Hide on small mobile */
+    .d-none-small {
+        display: none !important;
+    }
+    
+    /* Smaller text on mobile */
+    .text-small-mobile {
+        font-size: 14px !important;
+    }
+}
+
+/* ============================================
+   ACCESSIBILITY
+   ============================================ */
+
+/* Focus styles for keyboard navigation */
+*:focus-visible {
+    outline: 2px solid var(--theme-icon-color);
+    outline-offset: 2px;
+}
+
+/* Reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* ============================================
+   PRINT STYLES
+   ============================================ */
+
+@media print {
+    .no-print {
+        display: none !important;
+    }
+    body {
+        background: #fff !important;
+        color: #000 !important;
+    }
+    .main-content {
+        padding: 0 !important;
+        max-width: 100% !important;
+    }
 }

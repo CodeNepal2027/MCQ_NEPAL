@@ -19,7 +19,6 @@ const Navbar = () => {
     const applyTheme = (selectedTheme) => {
         const root = document.documentElement;
         
-        // Remove existing theme classes
         root.classList.remove('theme-light', 'theme-dark');
         
         if (selectedTheme === 'system') {
@@ -89,7 +88,7 @@ const Navbar = () => {
                 {/* Logo */}
                 <Link to="/" className="navbar-brand">
                     <span className="brand-icon">📝</span>
-                    <span className="brand-text">Nepal MCQ Hub</span>
+                    <span className="brand-text">MCQ NEPAL</span>
                 </Link>
 
                 {/* Navigation Links - Desktop */}
@@ -111,9 +110,8 @@ const Navbar = () => {
                     </Link>
                 </div>
 
-                {/* Right side: Theme toggle + Mobile menu button */}
+                {/* Right side: Theme toggle */}
                 <div className="navbar-actions">
-                    {/* Theme Dropdown */}
                     <div className="theme-dropdown" ref={dropdownRef}>
                         <button 
                             className="theme-toggle-btn"

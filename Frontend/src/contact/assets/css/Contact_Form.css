@@ -1,0 +1,243 @@
+/* ===== CONTACT FORM ===== */
+.contact-form-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    height: 100%;
+}
+
+.form-header {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.form-header h3 {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text-color-1);
+    letter-spacing: -0.01em;
+}
+
+.form-header p {
+    font-size: 15px;
+    color: var(--text-color-3);
+}
+
+/* Contact Form */
+.contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    flex: 1;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.form-group label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-color-2);
+    letter-spacing: 0.3px;
+}
+
+.form-group input,
+.form-group textarea {
+    padding: 12px 16px;
+    border: 1.5px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    font-size: 15px;
+    background: var(--bg-main-2);
+    color: var(--text-color-1);
+    transition: all var(--transition);
+    font-family: inherit;
+    width: 100%;
+    min-width: 0;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--theme-icon-color);
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.08);
+    background: var(--bg-main-1);
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+    color: var(--text-color-4);
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 120px;
+}
+
+.submit-btn {
+    padding: 14px 28px;
+    background: var(--primary-gradient);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 4px;
+    width: 100%;
+}
+
+.submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(220, 38, 38, 0.3);
+    background: var(--primary-gradient-hover);
+}
+
+.submit-btn:active {
+    transform: translateY(0);
+}
+
+.submit-btn i {
+    font-size: 18px;
+    transition: transform var(--transition);
+}
+
+.submit-btn:hover i {
+    transform: translateX(4px);
+}
+
+.success-message {
+    padding: 14px 18px;
+    background: #dcfce7;
+    border: 1px solid #86efac;
+    border-radius: var(--radius-sm);
+    color: #166534;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 500;
+    animation: fadeIn 0.3s ease;
+}
+
+.success-message i {
+    font-size: 20px;
+    color: #16a34a;
+    flex-shrink: 0;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1024px) {
+    .form-header h3 {
+        font-size: 22px;
+    }
+
+    .form-group input,
+    .form-group textarea {
+        padding: 10px 14px;
+        font-size: 14px;
+    }
+
+    .submit-btn {
+        padding: 12px 24px;
+        font-size: 15px;
+    }
+}
+
+@media (max-width: 768px) {
+    .contact-form-wrapper {
+        gap: 20px;
+    }
+
+    .form-header h3 {
+        font-size: 20px;
+    }
+
+    .form-header p {
+        font-size: 14px;
+    }
+
+    .contact-form {
+        gap: 16px;
+    }
+
+    .form-group input,
+    .form-group textarea {
+        padding: 10px 14px;
+        font-size: 14px;
+    }
+
+    .form-group textarea {
+        min-height: 100px;
+    }
+
+    .submit-btn {
+        padding: 12px 20px;
+        font-size: 15px;
+    }
+
+    .success-message {
+        padding: 12px 16px;
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    .contact-form-wrapper {
+        gap: 16px;
+    }
+
+    .form-header h3 {
+        font-size: 18px;
+    }
+
+    .form-header p {
+        font-size: 13px;
+    }
+
+    .contact-form {
+        gap: 14px;
+    }
+
+    .form-group label {
+        font-size: 12px;
+    }
+
+    .form-group input,
+    .form-group textarea {
+        padding: 10px 12px;
+        font-size: 14px;
+        border-radius: 6px;
+    }
+
+    .form-group textarea {
+        min-height: 80px;
+    }
+
+    .submit-btn {
+        padding: 12px 16px;
+        font-size: 14px;
+        border-radius: 6px;
+    }
+
+    .submit-btn i {
+        font-size: 16px;
+    }
+
+    .success-message {
+        padding: 10px 14px;
+        font-size: 13px;
+        border-radius: 6px;
+    }
+
+    .success-message i {
+        font-size: 18px;
+    }
+}

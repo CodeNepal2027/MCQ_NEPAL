@@ -1,0 +1,70 @@
+/* About Team Section */
+.about-team {
+    padding: 80px 0;
+    /* background: var(--bg-main-1); */
+}
+
+.team-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+.team-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+}
+
+.team-card {
+    background: var(--bg-main-3);
+    padding: 32px 24px;
+    border-radius: 16px;
+    border: 1px solid var(--border-color);
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.team-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 40px var(--shadow-color);
+}
+
+.team-avatar {
+    font-size: 56px;
+    margin-bottom: 12px;
+}
+
+.team-name {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-color-1);
+    margin-bottom: 4px;
+}
+
+.team-role {
+    display: inline-block;
+    font-size: 14px;
+    color: var(--theme-icon-color);
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.team-bio {
+    font-size: 14px;
+    color: var(--text-color-3);
+    line-height: 1.6;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .about-team {
+        padding: 60px 0;
+    }
+
+    .team-grid {
+        grid-template-columns: 1fr;
+        max-width: 400px;
+        margin: 0 auto;
+    }
+}

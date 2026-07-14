@@ -4,24 +4,26 @@ import './App.css'
 
 import Navbar from './global/Navbar'
 import Footer from "./global/Footer"
+import { Home } from './home/Home_Import'
+import { About } from './about/About_Import'
+import { Contact } from './contact/Contact_Import'
 
 function App() {
-  return(
-    <BrowserRouter>
-            <div className="app-container">
-                <Navbar />
-                <main className="main-content">
-                    <Routes>
-                        {/* <Route path="/" element={<div>Home Page</div>} />
-                        <Route path="/categories" element={<div>Categories Page</div>} />
-                        <Route path="/about" element={<div>About Page</div>} />
-                        <Route path="/contact" element={<div>Contact Page</div>} /> */}
-                    </Routes>
-                </main>
-                <Footer />
-            </div>
-        </BrowserRouter>
-  )
+    return(
+        <BrowserRouter>
+                <div className="app-container">
+                    <Navbar />
+                    <main className="main-content">
+                        <Routes>
+                            <Route path="/" element={<Home />} />
+                            <Route path="/about" element={<About />} />
+                            <Route path="/contact" element={<Contact />} />
+                        </Routes>
+                    </main>
+                    <Footer />
+                </div>
+            </BrowserRouter>
+    )
 }
 
 export default App
