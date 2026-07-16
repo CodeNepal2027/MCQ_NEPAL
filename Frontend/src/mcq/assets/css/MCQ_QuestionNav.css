@@ -1,0 +1,74 @@
+/* ===== MCQ NAVIGATION ===== */
+.mcq-nav-container {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 20px;
+}
+
+.mcq-nav-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 28px;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition);
+}
+
+.mcq-nav-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.mcq-nav-btn.prev {
+    background: var(--bg-main-2);
+    color: var(--text-color-2);
+    border: 1px solid var(--border-color);
+}
+
+.mcq-nav-btn.prev:hover:not(:disabled) {
+    background: var(--bg-main-3);
+    transform: translateX(-2px);
+}
+
+.mcq-nav-btn.next {
+    background: var(--bg-main-2);
+    color: var(--text-color-2);
+    border: 1px solid var(--border-color);
+}
+
+.mcq-nav-btn.next:hover:not(:disabled) {
+    background: var(--bg-main-3);
+    transform: translateX(2px);
+}
+
+.mcq-nav-btn.submit {
+    background: var(--primary-gradient);
+    color: #fff;
+    box-shadow: 0 4px 20px rgba(178, 38, 220, 0.3);
+}
+
+.mcq-nav-btn.submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(178, 38, 220, 0.4);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 480px) {
+    .mcq-nav-container {
+        gap: 8px;
+    }
+
+    .mcq-nav-btn {
+        padding: 10px 18px;
+        font-size: 14px;
+        flex: 1;
+        justify-content: center;
+        min-width: 80px;
+    }
+}

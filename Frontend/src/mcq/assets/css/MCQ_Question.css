@@ -1,0 +1,420 @@
+/* ============================================
+   MCQ QUESTION - PROFESSIONAL DESIGN
+   ============================================ */
+
+.mcq-question-container {
+    background: var(--bg-main-1);
+    padding: 32px 28px 24px;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 20px;
+    transition: all var(--transition);
+}
+
+/* ----- Header ----- */
+.mcq-question-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 18px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.question-number {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.number-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-color-1);
+}
+
+.number-badge i {
+    font-size: 14px;
+    color: var(--theme-icon-color);
+}
+
+.total-questions {
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--text-color-3);
+}
+
+.question-status {
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.status-answered {
+    color: var(--success-color);
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.status-answered i {
+    font-size: 16px;
+}
+
+.status-unanswered {
+    color: var(--text-color-3);
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.status-unanswered i {
+    font-size: 16px;
+}
+
+/* ----- Question Text ----- */
+.mcq-question-text {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text-color-1);
+    line-height: 1.7;
+    margin-bottom: 24px;
+    padding: 4px 0;
+}
+
+/* ----- Options ----- */
+.mcq-options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.mcq-option {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 18px;
+    background: var(--bg-main-2);
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.mcq-option:hover:not(.correct):not(.wrong) {
+    border-color: var(--theme-icon-color);
+    background: var(--bg-main-3);
+    transform: translateX(4px);
+}
+
+.mcq-option.selected {
+    border-color: var(--theme-icon-color);
+    background: var(--bg-main-3);
+    transform: translateX(4px);
+}
+
+.mcq-option.correct {
+    border-color: var(--success-color);
+    background: #dcfce7;
+}
+
+.mcq-option.wrong {
+    border-color: var(--error-color);
+    background: #fecaca;
+}
+
+.mcq-option-label {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    font-weight: 700;
+    font-size: 14px;
+    flex-shrink: 0;
+    background: var(--bg-main-2);
+    color: var(--text-color-2);
+    transition: all 0.3s ease;
+}
+
+.mcq-option.selected .mcq-option-label {
+    background: var(--theme-icon-color);
+    color: #fff;
+}
+
+.mcq-option.correct .mcq-option-label {
+    background: var(--success-color);
+    color: #fff;
+}
+
+.mcq-option.wrong .mcq-option-label {
+    background: var(--error-color);
+    color: #fff;
+}
+
+.mcq-option-text {
+    flex: 1;
+    color: var(--text-color-1);
+    font-size: 16px;
+}
+
+.mcq-option-icon {
+    font-size: 22px;
+    flex-shrink: 0;
+}
+
+.mcq-option-icon.correct-icon {
+    color: var(--success-color);
+}
+
+.mcq-option-icon.wrong-icon {
+    color: var(--error-color);
+}
+
+/* ----- Explanation ----- */
+.mcq-explanation {
+    margin-top: 20px;
+    padding: 20px 24px;
+    background: var(--bg-main-2);
+    border-radius: var(--radius-md);
+    border-left: 4px solid var(--theme-icon-color);
+    animation: fadeIn 0.3s ease;
+}
+
+.mcq-explanation-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.mcq-explanation-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 16px;
+    border-radius: 50px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.mcq-explanation-badge.correct {
+    background: #dcfce7;
+    color: var(--success-color);
+}
+
+.mcq-explanation-badge.incorrect {
+    background: #fecaca;
+    color: var(--error-color);
+}
+
+.mcq-explanation-badge i {
+    font-size: 16px;
+}
+
+.explanation-toggle {
+    background: none;
+    border: none;
+    color: var(--text-color-3);
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: all var(--transition);
+}
+
+.explanation-toggle:hover {
+    background: var(--bg-main-3);
+    color: var(--text-color-1);
+}
+
+.explanation-toggle i {
+    font-size: 18px;
+}
+
+.mcq-explanation-text {
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--text-color-2);
+    margin: 0;
+}
+
+/* ----- Footer / Progress Dots ----- */
+.mcq-question-footer {
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border-color);
+}
+
+.question-progress-dots {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.progress-dot {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--bg-main-2);
+    border: 2px solid var(--border-color);
+    transition: all var(--transition);
+    cursor: pointer;
+    position: relative;
+}
+
+.progress-dot:hover {
+    transform: scale(1.15);
+}
+
+.progress-dot.active {
+    border-color: var(--theme-icon-color);
+    background: var(--theme-icon-color);
+    transform: scale(1.15);
+}
+
+.progress-dot.answered {
+    border-color: var(--success-color);
+    background: var(--success-color);
+}
+
+.progress-dot.answered.active {
+    border-color: var(--theme-icon-color);
+    background: var(--theme-icon-color);
+}
+
+/* ----- Empty State ----- */
+.mcq-question-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 200px;
+    gap: 12px;
+    text-align: center;
+}
+
+.mcq-question-empty i {
+    font-size: 48px;
+    color: var(--text-color-4);
+}
+
+.mcq-question-empty p {
+    font-size: 16px;
+    color: var(--text-color-3);
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 768px) {
+    .mcq-question-container {
+        padding: 20px 16px 18px;
+        border-radius: var(--radius-md);
+    }
+
+    .mcq-question-text {
+        font-size: 17px;
+    }
+
+    .mcq-option {
+        padding: 12px 14px;
+        gap: 10px;
+    }
+
+    .mcq-option-text {
+        font-size: 14px;
+    }
+
+    .mcq-option-label {
+        width: 28px;
+        height: 28px;
+        font-size: 12px;
+    }
+
+    .mcq-explanation {
+        padding: 16px 18px;
+    }
+
+    .mcq-explanation-text {
+        font-size: 14px;
+    }
+
+    .progress-dot {
+        width: 22px;
+        height: 22px;
+    }
+
+    .question-status {
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .mcq-question-container {
+        padding: 16px 12px 14px;
+    }
+
+    .mcq-question-header {
+        flex-direction: column;
+        gap: 8px;
+        align-items: flex-start;
+    }
+
+    .mcq-question-text {
+        font-size: 15px;
+        margin-bottom: 16px;
+    }
+
+    .mcq-option {
+        padding: 10px 12px;
+        gap: 8px;
+    }
+
+    .mcq-option-text {
+        font-size: 13px;
+    }
+
+    .mcq-option-label {
+        width: 24px;
+        height: 24px;
+        font-size: 11px;
+    }
+
+    .mcq-option-icon {
+        font-size: 18px;
+    }
+
+    .mcq-explanation {
+        padding: 14px 14px;
+    }
+
+    .mcq-explanation-badge {
+        font-size: 12px;
+        padding: 3px 12px;
+    }
+
+    .mcq-explanation-text {
+        font-size: 13px;
+    }
+
+    .progress-dot {
+        width: 18px;
+        height: 18px;
+        border-width: 2px;
+    }
+
+    .question-progress-dots {
+        gap: 4px;
+    }
+
+    .number-badge {
+        font-size: 14px;
+    }
+}

@@ -1,0 +1,263 @@
+/* ============================================
+   MCQ PROGRESS - PROFESSIONAL DESIGN
+   ============================================ */
+
+.mcq-progress-container {
+    background: var(--bg-main-1);
+    padding: 20px 24px;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-color);
+    margin-bottom: 20px;
+    box-shadow: var(--shadow-sm);
+}
+
+/* ----- Top Section ----- */
+.mcq-progress-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.mcq-progress-info {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.progress-label {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-color-1);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.progress-label i {
+    color: var(--theme-icon-color);
+    font-size: 16px;
+}
+
+.progress-stats {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.stat-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 4px 12px;
+    border-radius: 50px;
+    border: 1px solid var(--border-color);
+}
+
+.stat-badge.answered {
+    color: var(--success-color);
+    background: #dcfce7;
+    border-color: #86efac;
+}
+
+.stat-badge.answered i {
+    font-size: 14px;
+}
+
+.stat-badge.remaining {
+    color: var(--text-color-3);
+    background: var(--bg-main-2);
+}
+
+.stat-badge.remaining i {
+    font-size: 14px;
+}
+
+.mcq-progress-score {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--bg-main-2);
+    padding: 4px 14px 4px 10px;
+    border-radius: 50px;
+    border: 1px solid var(--border-color);
+}
+
+.score-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-color-3);
+}
+
+.score-value {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--theme-icon-color);
+}
+
+/* ----- Progress Bar ----- */
+.mcq-progress-bar-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+
+.mcq-progress-bar {
+    flex: 1;
+    height: 8px;
+    background: var(--bg-main-2);
+    border-radius: 4px;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+}
+
+.mcq-progress-fill {
+    height: 100%;
+    background: var(--primary-gradient);
+    border-radius: 4px;
+    transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+}
+
+.mcq-progress-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    animation: shimmer 2s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+.mcq-progress-percentage {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-color-1);
+    min-width: 44px;
+    text-align: right;
+}
+
+/* ----- Progress Dots ----- */
+.mcq-progress-dots {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+    padding-top: 4px;
+}
+
+.mcq-dot {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--bg-main-2);
+    border: 2px solid var(--border-color);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+}
+
+.mcq-dot:hover {
+    transform: scale(1.2);
+}
+
+.mcq-dot.active {
+    border-color: var(--theme-icon-color);
+    background: var(--theme-icon-color);
+    transform: scale(1.15);
+    box-shadow: 0 0 0 4px rgba(178, 38, 220, 0.15);
+}
+
+.mcq-dot.answered {
+    border-color: var(--success-color);
+    background: var(--success-color);
+}
+
+.mcq-dot.answered.active {
+    border-color: var(--theme-icon-color);
+    background: var(--theme-icon-color);
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 768px) {
+    .mcq-progress-container {
+        padding: 16px 18px;
+    }
+
+    .mcq-progress-top {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+    }
+
+    .mcq-progress-info {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+    }
+
+    .progress-stats {
+        flex-wrap: wrap;
+    }
+
+    .mcq-progress-score {
+        align-self: flex-start;
+    }
+
+    .mcq-dot {
+        width: 20px;
+        height: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .mcq-progress-container {
+        padding: 14px 12px;
+    }
+
+    .progress-label {
+        font-size: 13px;
+    }
+
+    .stat-badge {
+        font-size: 11px;
+        padding: 3px 10px;
+    }
+
+    .mcq-progress-bar {
+        height: 6px;
+    }
+
+    .mcq-progress-percentage {
+        font-size: 12px;
+        min-width: 36px;
+    }
+
+    .mcq-dot {
+        width: 16px;
+        height: 16px;
+        border-width: 2px;
+    }
+
+    .mcq-progress-dots {
+        gap: 4px;
+    }
+
+    .score-value {
+        font-size: 14px;
+    }
+}

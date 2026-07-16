@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import "./assets/css/Navbar.css";
 
 const Navbar = () => {
+    const navigate = useNavigate();
     const [theme, setTheme] = useState('system');
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -82,32 +83,68 @@ const Navbar = () => {
         return currentTheme ? currentTheme.label : 'System';
     };
 
+    // Scroll to top and navigate
+    const handleNavigation = (path) => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        setIsMobileMenuOpen(false);
+        setTimeout(() => {
+            navigate(path);
+        }, 150);
+    };
+
     return (
         <nav className="navbar-main">
             <div className="navbar-container">
                 {/* Logo */}
-                <Link to="/" className="navbar-brand">
+                <Link 
+                    to="/" 
+                    className="navbar-brand"
+                    onClick={(e) => {
+                        e.preventDefault();
+                        handleNavigation('/');
+                    }}
+                >
                     <span className="brand-icon">📝</span>
                     <span className="brand-text">MCQ NEPAL</span>
                 </Link>
 
                 {/* Navigation Links - Desktop */}
                 <div className={`navbar-links ${isMobileMenuOpen ? 'active' : ''}`}>
-                    <Link to="/" className="nav-link" onClick={() => setIsMobileMenuOpen(false)}>
+                    <button 
+                        className="nav-link"
+                        onClick={() => handleNavigation('/')}
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', font: 'inherit' }}
+                    >
                         <i className="bi bi-house-fill"></i> Home
-                    </Link>
-                    <Link to="/mcq" className="nav-link" onClick={() => setIsMobileMenuOpen(false)}>
+                    </button>
+                    <button 
+                        className="nav-link"
+                        onClick={() => handleNavigation('/mcq')}
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', font: 'inherit' }}
+                    >
                         <i className="bi bi-grid-fill"></i> MCQ
-                    </Link>
-                    <Link to="/mcq" className="nav-link" onClick={() => setIsMobileMenuOpen(false)}>
+                    </button>
+                    <button 
+                        className="nav-link"
+                        onClick={() => handleNavigation('/mcq')}
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', font: 'inherit' }}
+                    >
                         <i className="bi bi-alarm-fill"></i> Test
-                    </Link>
-                    <Link to="/about" className="nav-link" onClick={() => setIsMobileMenuOpen(false)}>
+                    </button>
+                    <button 
+                        className="nav-link"
+                        onClick={() => handleNavigation('/about')}
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', font: 'inherit' }}
+                    >
                         <i className="bi bi-info-circle-fill"></i> About
-                    </Link>
-                    <Link to="/contact" className="nav-link" onClick={() => setIsMobileMenuOpen(false)}>
+                    </button>
+                    <button 
+                        className="nav-link"
+                        onClick={() => handleNavigation('/contact')}
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', font: 'inherit' }}
+                    >
                         <i className="bi bi-envelope-fill"></i> Contact
-                    </Link>
+                    </button>
                 </div>
 
                 {/* Right side: Theme toggle */}

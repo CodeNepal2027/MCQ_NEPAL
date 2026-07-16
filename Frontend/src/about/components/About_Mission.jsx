@@ -6,7 +6,7 @@ const About_Mission = () => {
         <section className="about-mission">
             <div className="mission-container">
                 <div className="mission-card">
-                    <div className="mission-icon">🎯</div>
+                    <div className="mission-icon"><i className="bi bi-bullseye"></i></div>
                     <h3>Our Mission</h3>
                     <p>
                         To provide accessible, high-quality MCQ practice resources to every 
@@ -14,7 +14,7 @@ const About_Mission = () => {
                     </p>
                 </div>
                 <div className="mission-card">
-                    <div className="mission-icon">👁️</div>
+                    <div className="mission-icon"><i className="bi bi-eye-fill"></i></div>
                     <h3>Our Vision</h3>
                     <p>
                         To become Nepal's most trusted and comprehensive MCQ practice platform, 
@@ -22,7 +22,7 @@ const About_Mission = () => {
                     </p>
                 </div>
                 <div className="mission-card">
-                    <div className="mission-icon">💎</div>
+                    <div className="mission-icon"><i className="bi bi-gem"></i></div>
                     <h3>Our Values</h3>
                     <p>
                         Quality, accessibility, innovation, and student success. We believe in 
