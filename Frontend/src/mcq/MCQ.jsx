@@ -3,10 +3,11 @@ import { useMCQ, ACTIONS } from './MCQ_API_Context';
 import { fetchCategories } from './MCQ_API_Fetch';
 import { 
     MCQ_Category,
-    MCQ_SubCategory,
+    MCQ_Faculty,
+    MCQ_Branch,
+    MCQ_Chapter,
     MCQ_Question,
     MCQ_Result,
-    MCQ_Progress,
     MCQ_QuestionNav
 } from './MCQ_Import';
 import './assets/css/MCQ.css';
@@ -15,20 +16,28 @@ const MCQ = () => {
     const { 
         categories,
         selectedCategory, 
-        selectedSubCategory, 
+        selectedFaculty,
+        selectedBranch,
+        selectedChapter,
         questions, 
         quizCompleted,
         isLoading,
         error,
-        dispatch
+        dispatch,
+        selectedAnswers
     } = useMCQ();
 
     const [loadingMessage, setLoadingMessage] = useState('Loading...');
 
-    // Load categories on mount with better loading experience
+    // Scroll to top function
+    const scrollToTop = () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    // Load categories on mount
     useEffect(() => {
         const loadCategories = async () => {
-            if (categories.length > 0) return; // Don't reload if already loaded
+            if (categories.length > 0) return;
             
             dispatch({ type: ACTIONS.SET_LOADING, payload: true });
             setLoadingMessage('Loading categories...');
@@ -43,7 +52,12 @@ const MCQ = () => {
         loadCategories();
     }, [categories.length, dispatch]);
 
-    // Show loading state with better UI
+    // Scroll to top when any level changes
+    useEffect(() => {
+        scrollToTop();
+    }, [selectedCategory, selectedFaculty, selectedBranch, selectedChapter, quizCompleted]);
+
+    // Show loading state
     if (isLoading && categories.length === 0) {
         return (
             <div className="mcq-loading-container">
@@ -73,24 +87,33 @@ const MCQ = () => {
         );
     }
 
-    // Render Category Selection
+    // Level 1: Category Selection
     if (!selectedCategory) {
         return <MCQ_Category />;
     }
 
-    // Render Sub-Category Selection
-    if (selectedCategory && !selectedSubCategory) {
-        return <MCQ_SubCategory />;
+    // Level 2: Faculty Selection
+    if (selectedCategory && !selectedFaculty) {
+        return <MCQ_Faculty />;
     }
 
-    // Render Quiz
-    if (selectedCategory && selectedSubCategory && questions.length > 0) {
+    // Level 3: Branch Selection
+    if (selectedCategory && selectedFaculty && !selectedBranch) {
+        return <MCQ_Branch />;
+    }
+
+    // Level 4: Chapter Selection
+    if (selectedCategory && selectedFaculty && selectedBranch && !selectedChapter) {
+        return <MCQ_Chapter />;
+    }
+
+    // Level 5: Quiz
+    if (selectedCategory && selectedFaculty && selectedBranch && selectedChapter && questions.length > 0) {
         if (quizCompleted) {
             return <MCQ_Result />;
         }
         return (
             <div className="mcq-quiz-wrapper">
-                <MCQ_Progress />
                 <MCQ_Question />
                 <MCQ_QuestionNav />
             </div>
@@ -115,9 +138,9 @@ const MCQ = () => {
                 <i className="bi bi-inbox-fill"></i>
             </div>
             <h3 className="mcq-empty-title">No questions available</h3>
-            <p className="mcq-empty-message">Please try another category or sub-category.</p>
+            <p className="mcq-empty-message">Please try another category, faculty, branch, or chapter.</p>
             <button 
-                onClick={() => dispatch({ type: ACTIONS.SELECT_CATEGORY, payload: null })}
+                onClick={() => dispatch({ type: ACTIONS.SELECT_CHAPTER, payload: null })}
                 className="mcq-empty-btn"
             >
                 <i className="bi bi-arrow-left"></i> Go Back

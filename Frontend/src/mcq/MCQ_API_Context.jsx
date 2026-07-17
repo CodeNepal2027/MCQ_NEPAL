@@ -6,7 +6,9 @@ import React, { createContext, useContext, useReducer } from 'react';
 const initialState = {
     categories: [],
     selectedCategory: null,
-    selectedSubCategory: null,
+    selectedFaculty: null,
+    selectedBranch: null,
+    selectedChapter: null,
     questions: [],
     currentQuestionIndex: 0,
     totalQuestions: 0,
@@ -24,7 +26,9 @@ const initialState = {
 export const ACTIONS = {
     SET_CATEGORIES: 'SET_CATEGORIES',
     SELECT_CATEGORY: 'SELECT_CATEGORY',
-    SELECT_SUB_CATEGORY: 'SELECT_SUB_CATEGORY',
+    SELECT_FACULTY: 'SELECT_FACULTY',
+    SELECT_BRANCH: 'SELECT_BRANCH',
+    SELECT_CHAPTER: 'SELECT_CHAPTER',
     SET_QUESTIONS: 'SET_QUESTIONS',
     NEXT_QUESTION: 'NEXT_QUESTION',
     PREV_QUESTION: 'PREV_QUESTION',
@@ -51,7 +55,9 @@ const mcqReducer = (state, action) => {
             return {
                 ...state,
                 selectedCategory: action.payload,
-                selectedSubCategory: null,
+                selectedFaculty: null,
+                selectedBranch: null,
+                selectedChapter: null,
                 questions: [],
                 currentQuestionIndex: 0,
                 selectedAnswers: {},
@@ -61,10 +67,39 @@ const mcqReducer = (state, action) => {
                 error: null
             };
 
-        case ACTIONS.SELECT_SUB_CATEGORY:
+        case ACTIONS.SELECT_FACULTY:
             return {
                 ...state,
-                selectedSubCategory: action.payload,
+                selectedFaculty: action.payload,
+                selectedBranch: null,
+                selectedChapter: null,
+                questions: [],
+                currentQuestionIndex: 0,
+                selectedAnswers: {},
+                quizCompleted: false,
+                score: 0,
+                totalQuestions: 0,
+                error: null
+            };
+
+        case ACTIONS.SELECT_BRANCH:
+            return {
+                ...state,
+                selectedBranch: action.payload,
+                selectedChapter: null,
+                questions: [],
+                currentQuestionIndex: 0,
+                selectedAnswers: {},
+                quizCompleted: false,
+                score: 0,
+                totalQuestions: 0,
+                error: null
+            };
+
+        case ACTIONS.SELECT_CHAPTER:
+            return {
+                ...state,
+                selectedChapter: action.payload,
                 questions: [],
                 currentQuestionIndex: 0,
                 selectedAnswers: {},
@@ -188,6 +223,24 @@ export const MCQProvider = ({ children }) => {
         return state.categories.find(c => c.id === state.selectedCategory) || null;
     };
 
+    const getFaculty = () => {
+        const category = getCategory();
+        if (!category) return null;
+        return category.faculties?.find(f => f.id === state.selectedFaculty) || null;
+    };
+
+    const getBranch = () => {
+        const faculty = getFaculty();
+        if (!faculty) return null;
+        return faculty.branches?.find(b => b.id === state.selectedBranch) || null;
+    };
+
+    const getChapter = () => {
+        const branch = getBranch();
+        if (!branch) return null;
+        return branch.chapters?.find(c => c.id === state.selectedChapter) || null;
+    };
+
     const value = {
         // State
         ...state,
@@ -198,6 +251,9 @@ export const MCQProvider = ({ children }) => {
         progress: getProgress(),
         scorePercentage: getScorePercentage(),
         category: getCategory(),
+        faculty: getFaculty(),
+        branch: getBranch(),
+        chapter: getChapter(),
         
         // Dispatch
         dispatch,
@@ -206,7 +262,9 @@ export const MCQProvider = ({ children }) => {
         // Action Creators
         setCategories: (categories) => dispatch({ type: ACTIONS.SET_CATEGORIES, payload: categories }),
         selectCategory: (categoryId) => dispatch({ type: ACTIONS.SELECT_CATEGORY, payload: categoryId }),
-        selectSubCategory: (subCategoryId) => dispatch({ type: ACTIONS.SELECT_SUB_CATEGORY, payload: subCategoryId }),
+        selectFaculty: (facultyId) => dispatch({ type: ACTIONS.SELECT_FACULTY, payload: facultyId }),
+        selectBranch: (branchId) => dispatch({ type: ACTIONS.SELECT_BRANCH, payload: branchId }),
+        selectChapter: (chapterId) => dispatch({ type: ACTIONS.SELECT_CHAPTER, payload: chapterId }),
         setQuestions: (questions) => dispatch({ type: ACTIONS.SET_QUESTIONS, payload: questions }),
         nextQuestion: () => dispatch({ type: ACTIONS.NEXT_QUESTION }),
         prevQuestion: () => dispatch({ type: ACTIONS.PREV_QUESTION }),

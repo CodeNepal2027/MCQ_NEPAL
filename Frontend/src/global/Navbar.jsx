@@ -124,13 +124,13 @@ const Navbar = () => {
                     >
                         <i className="bi bi-grid-fill"></i> MCQ
                     </button>
-                    <button 
+                    {/* <button 
                         className="nav-link"
                         onClick={() => handleNavigation('/mcq')}
                         style={{ background: 'none', border: 'none', cursor: 'pointer', font: 'inherit' }}
                     >
                         <i className="bi bi-alarm-fill"></i> Test
-                    </button>
+                    </button> */}
                     <button 
                         className="nav-link"
                         onClick={() => handleNavigation('/about')}

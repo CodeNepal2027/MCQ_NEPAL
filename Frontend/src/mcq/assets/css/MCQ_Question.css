@@ -1,105 +1,265 @@
 /* ============================================
-   MCQ QUESTION - PROFESSIONAL DESIGN
+   MCQ QUESTION - SCROLLABLE ALL QUESTIONS
    ============================================ */
 
 .mcq-question-container {
-    background: var(--bg-main-1);
-    padding: 32px 28px 24px;
-    border-radius: var(--radius-lg);
-    border: 1px solid var(--border-color);
-    box-shadow: var(--shadow-sm);
-    margin-bottom: 20px;
-    transition: all var(--transition);
+    margin: 0 auto;
+    padding: 20px;
+    animation: fadeIn 0.4s ease;
 }
 
-/* ----- Header ----- */
-.mcq-question-header {
+/* ============================================
+   BACK BUTTON HEADER
+   ============================================ */
+
+.mcq-question-header-top {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 18px;
-    padding-bottom: 14px;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border-color);
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.mcq-back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: none;
+    border: none;
+    color: var(--text-color-2);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 8px 12px;
+    border-radius: var(--radius-sm);
+    transition: all var(--transition);
+    width: fit-content;
+}
+
+.mcq-back-btn:hover {
+    color: var(--theme-icon-color);
+    background: var(--bg-main-2);
+    transform: translateX(-4px);
+}
+
+.mcq-back-btn i {
+    font-size: 16px;
+}
+
+.header-info {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.chapter-name {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-color-1);
+    background: var(--bg-main-2);
+    padding: 6px 14px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-color);
+}
+
+.chapter-name i {
+    font-size: 14px;
+    color: var(--theme-icon-color);
+}
+
+.branch-name {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-color-3);
+    background: var(--bg-main-2);
+    padding: 6px 14px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-color);
+}
+
+.branch-name i {
+    font-size: 13px;
+    color: var(--text-color-4);
+}
+
+/* ============================================
+   PROGRESS HEADER
+   ============================================ */
+
+.mcq-progress-header {
+    background: var(--bg-main-1);
+    padding: 20px 24px;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-color);
+    margin-bottom: 24px;
+    box-shadow: var(--shadow-sm);
+}
+
+.mcq-progress-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.mcq-progress-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-color-1);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.mcq-progress-title i {
+    color: var(--theme-icon-color);
+    font-size: 18px;
+}
+
+.mcq-progress-count {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-color-2);
+}
+
+.mcq-progress-bar-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.mcq-progress-bar {
+    flex: 1;
+    height: 8px;
+    background: var(--bg-main-2);
+    border-radius: 4px;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+}
+
+.mcq-progress-fill {
+    height: 100%;
+    background: var(--primary-gradient);
+    border-radius: 4px;
+    transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.mcq-progress-percentage {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-color-1);
+    min-width: 44px;
+    text-align: right;
+}
+
+/* ============================================
+   QUESTIONS LIST
+   ============================================ */
+
+.mcq-questions-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* ============================================
+   QUESTION ITEM
+   ============================================ */
+
+.mcq-question-item {
+    background: var(--bg-main-3);
+    padding: 28px 24px 24px;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-sm);
+    transition: all var(--transition);
+}
+
+.mcq-question-item:hover {
+    box-shadow: var(--shadow-md);
+}
+
+/* Question Number */
+.mcq-question-number {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+    padding-bottom: 12px;
     border-bottom: 1px solid var(--border-color);
 }
 
-.question-number {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.number-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
+.q-number {
     font-size: 16px;
     font-weight: 700;
     color: var(--text-color-1);
 }
 
-.number-badge i {
-    font-size: 14px;
-    color: var(--theme-icon-color);
-}
-
-.total-questions {
-    font-size: 14px;
-    font-weight: 400;
-    color: var(--text-color-3);
-}
-
-.question-status {
+.q-status {
     font-size: 13px;
     font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
 }
 
-.status-answered {
+.q-status.answered {
     color: var(--success-color);
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
 }
 
-.status-answered i {
+.q-status.answered i {
     font-size: 16px;
 }
 
-.status-unanswered {
+.q-status.unanswered {
     color: var(--text-color-3);
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
 }
 
-.status-unanswered i {
+.q-status.unanswered i {
     font-size: 16px;
 }
 
-/* ----- Question Text ----- */
+/* Question Text */
 .mcq-question-text {
-    font-size: 20px;
-    font-weight: 600;
+    font-size: 18px;
+    font-weight: 500;
     color: var(--text-color-1);
     line-height: 1.7;
-    margin-bottom: 24px;
+    margin-bottom: 18px;
     padding: 4px 0;
 }
 
-/* ----- Options ----- */
+/* ============================================
+   OPTIONS
+   ============================================ */
+
 .mcq-options {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 10px;
+    margin-bottom: 16px;
 }
 
 .mcq-option {
     display: flex;
     align-items: center;
     gap: 14px;
-    padding: 14px 18px;
+    padding: 12px 16px;
     background: var(--bg-main-2);
     border: 2px solid var(--border-color);
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-sm);
     cursor: pointer;
     transition: all 0.3s ease;
     position: relative;
@@ -119,23 +279,23 @@
 
 .mcq-option.correct {
     border-color: var(--success-color);
-    background: #dcfce7;
+    background: #00ff5838;
 }
 
 .mcq-option.wrong {
     border-color: var(--error-color);
-    background: #fecaca;
+    background: #ff151570;
 }
 
 .mcq-option-label {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 32px;
-    height: 32px;
+    width: 30px;
+    height: 30px;
     border-radius: 50%;
     font-weight: 700;
-    font-size: 14px;
+    font-size: 13px;
     flex-shrink: 0;
     background: var(--bg-main-2);
     color: var(--text-color-2);
@@ -160,11 +320,11 @@
 .mcq-option-text {
     flex: 1;
     color: var(--text-color-1);
-    font-size: 16px;
+    font-size: 15px;
 }
 
 .mcq-option-icon {
-    font-size: 22px;
+    font-size: 20px;
     flex-shrink: 0;
 }
 
@@ -176,20 +336,72 @@
     color: var(--error-color);
 }
 
-/* ----- Explanation ----- */
+/* ============================================
+   ACTION BUTTONS
+   ============================================ */
+
+.mcq-question-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 4px;
+}
+
+.mcq-action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    background: #b11cbd8a;
+    color: var(--text-color-2);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.mcq-action-btn:hover:not(:disabled) {
+    background: #c441ce8a;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+}
+
+.mcq-action-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.mcq-action-btn.active {
+    border-color: var(--theme-icon-color);
+    background: var(--theme-icon-color);
+    color: #fff;
+}
+
+.mcq-action-btn.active:hover {
+    background: var(--theme-icon-hover);
+    border-color: var(--theme-icon-hover);
+}
+
+.mcq-action-btn i {
+    font-size: 16px;
+}
+
+/* ============================================
+   EXPLANATION
+   ============================================ */
+
 .mcq-explanation {
-    margin-top: 20px;
-    padding: 20px 24px;
+    margin-top: 14px;
+    padding: 16px 20px;
     background: var(--bg-main-2);
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-sm);
     border-left: 4px solid var(--theme-icon-color);
     animation: fadeIn 0.3s ease;
 }
 
 .mcq-explanation-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
     margin-bottom: 8px;
 }
 
@@ -197,9 +409,9 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    padding: 4px 16px;
+    padding: 4px 14px;
     border-radius: 50px;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 600;
 }
 
@@ -214,87 +426,60 @@
 }
 
 .mcq-explanation-badge i {
-    font-size: 16px;
+    font-size: 14px;
 }
 
-.explanation-toggle {
-    background: none;
-    border: none;
-    color: var(--text-color-3);
-    cursor: pointer;
-    padding: 4px 8px;
-    border-radius: 4px;
-    transition: all var(--transition);
+.explanation-row {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 6px;
+    flex-wrap: wrap;
 }
 
-.explanation-toggle:hover {
-    background: var(--bg-main-3);
+.explanation-label {
+    font-weight: 600;
+    color: var(--text-color-2);
+    font-size: 13px;
+}
+
+.explanation-value {
+    font-size: 14px;
     color: var(--text-color-1);
 }
 
-.explanation-toggle i {
-    font-size: 18px;
+.explanation-value.correct-text {
+    color: var(--success-color);
+    font-weight: 600;
+}
+
+.explanation-divider {
+    height: 1px;
+    background: var(--border-color);
+    margin: 8px 0;
 }
 
 .mcq-explanation-text {
-    font-size: 15px;
+    font-size: 14px;
     line-height: 1.7;
     color: var(--text-color-2);
     margin: 0;
 }
 
-/* ----- Footer / Progress Dots ----- */
-.mcq-question-footer {
-    margin-top: 20px;
-    padding-top: 16px;
-    border-top: 1px solid var(--border-color);
+.mcq-explanation-text .explanation-label {
+    margin-right: 6px;
 }
 
-.question-progress-dots {
-    display: flex;
-    gap: 6px;
-    flex-wrap: wrap;
-    justify-content: center;
-}
+/* ============================================
+   EMPTY STATE
+   ============================================ */
 
-.progress-dot {
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    background: var(--bg-main-2);
-    border: 2px solid var(--border-color);
-    transition: all var(--transition);
-    cursor: pointer;
-    position: relative;
-}
-
-.progress-dot:hover {
-    transform: scale(1.15);
-}
-
-.progress-dot.active {
-    border-color: var(--theme-icon-color);
-    background: var(--theme-icon-color);
-    transform: scale(1.15);
-}
-
-.progress-dot.answered {
-    border-color: var(--success-color);
-    background: var(--success-color);
-}
-
-.progress-dot.answered.active {
-    border-color: var(--theme-icon-color);
-    background: var(--theme-icon-color);
-}
-
-/* ----- Empty State ----- */
 .mcq-question-empty {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    min-height: 200px;
+    min-height: 300px;
     gap: 12px;
     text-align: center;
 }
@@ -315,16 +500,34 @@
 
 @media (max-width: 768px) {
     .mcq-question-container {
+        padding: 12px;
+    }
+
+    .mcq-question-header-top {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .header-info {
+        width: 100%;
+        flex-wrap: wrap;
+    }
+
+    .mcq-progress-header {
+        padding: 16px 18px;
+    }
+
+    .mcq-question-item {
         padding: 20px 16px 18px;
-        border-radius: var(--radius-md);
     }
 
     .mcq-question-text {
-        font-size: 17px;
+        font-size: 16px;
     }
 
     .mcq-option {
-        padding: 12px 14px;
+        padding: 10px 14px;
         gap: 10px;
     }
 
@@ -333,47 +536,88 @@
     }
 
     .mcq-option-label {
-        width: 28px;
-        height: 28px;
+        width: 26px;
+        height: 26px;
+        font-size: 12px;
+    }
+
+    .mcq-action-btn {
+        padding: 7px 14px;
         font-size: 12px;
     }
 
     .mcq-explanation {
-        padding: 16px 18px;
+        padding: 14px 16px;
     }
 
     .mcq-explanation-text {
+        font-size: 13px;
+    }
+
+    .mcq-progress-title {
         font-size: 14px;
     }
 
-    .progress-dot {
-        width: 22px;
-        height: 22px;
+    .mcq-progress-count {
+        font-size: 13px;
     }
 
-    .question-status {
-        font-size: 12px;
+    .q-number {
+        font-size: 14px;
     }
 }
 
 @media (max-width: 480px) {
     .mcq-question-container {
-        padding: 16px 12px 14px;
+        padding: 8px;
     }
 
-    .mcq-question-header {
-        flex-direction: column;
+    .mcq-question-header-top {
         gap: 8px;
+    }
+
+    .chapter-name {
+        font-size: 13px;
+        padding: 4px 12px;
+    }
+
+    .branch-name {
+        font-size: 12px;
+        padding: 4px 12px;
+    }
+
+    .mcq-progress-header {
+        padding: 14px 14px;
+    }
+
+    .mcq-progress-info {
+        flex-direction: column;
         align-items: flex-start;
+        gap: 4px;
+    }
+
+    .mcq-question-item {
+        padding: 16px 12px 14px;
+        border-radius: var(--radius-md);
+    }
+
+    .mcq-question-number {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
     }
 
     .mcq-question-text {
         font-size: 15px;
-        margin-bottom: 16px;
+        margin-bottom: 14px;
+    }
+
+    .mcq-options {
+        gap: 8px;
     }
 
     .mcq-option {
-        padding: 10px 12px;
+        padding: 8px 12px;
         gap: 8px;
     }
 
@@ -382,39 +626,72 @@
     }
 
     .mcq-option-label {
-        width: 24px;
-        height: 24px;
+        width: 22px;
+        height: 22px;
         font-size: 11px;
     }
 
     .mcq-option-icon {
-        font-size: 18px;
+        font-size: 16px;
+    }
+
+    .mcq-question-actions {
+        flex-direction: column;
+    }
+
+    .mcq-action-btn {
+        justify-content: center;
+        padding: 8px 14px;
+        font-size: 12px;
     }
 
     .mcq-explanation {
-        padding: 14px 14px;
+        padding: 12px 12px;
     }
 
     .mcq-explanation-badge {
         font-size: 12px;
-        padding: 3px 12px;
+        padding: 3px 10px;
     }
 
     .mcq-explanation-text {
         font-size: 13px;
     }
 
-    .progress-dot {
-        width: 18px;
-        height: 18px;
-        border-width: 2px;
-    }
-
-    .question-progress-dots {
-        gap: 4px;
-    }
-
-    .number-badge {
-        font-size: 14px;
+    .explanation-row {
+        flex-direction: column;
+        gap: 2px;
     }
 }
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Stagger animation for question items */
+.mcq-question-item {
+    animation: fadeIn 0.4s ease forwards;
+    opacity: 0;
+}
+
+.mcq-question-item:nth-child(1) { animation-delay: 0.05s; }
+.mcq-question-item:nth-child(2) { animation-delay: 0.1s; }
+.mcq-question-item:nth-child(3) { animation-delay: 0.15s; }
+.mcq-question-item:nth-child(4) { animation-delay: 0.2s; }
+.mcq-question-item:nth-child(5) { animation-delay: 0.25s; }
+.mcq-question-item:nth-child(6) { animation-delay: 0.3s; }
+.mcq-question-item:nth-child(7) { animation-delay: 0.35s; }
+.mcq-question-item:nth-child(8) { animation-delay: 0.4s; }
+.mcq-question-item:nth-child(9) { animation-delay: 0.45s; }
+.mcq-question-item:nth-child(10) { animation-delay: 0.5s; }

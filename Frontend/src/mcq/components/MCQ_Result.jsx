@@ -31,7 +31,7 @@ const MCQ_Result = () => {
     };
 
     const handleBack = () => {
-        dispatch({ type: ACTIONS.SELECT_CATEGORY, payload: null });
+        dispatch({ type: ACTIONS.SELECT_CHAPTER, payload: null });
     };
 
     return (
@@ -71,7 +71,7 @@ const MCQ_Result = () => {
                     <i className="bi bi-arrow-repeat"></i> Retry Quiz
                 </button>
                 <button className="mcq-action-btn back" onClick={handleBack}>
-                    <i className="bi bi-arrow-left"></i> Back to Categories
+                    <i className="bi bi-arrow-left"></i> Back to Chapters
                 </button>
             </div>
 

@@ -5,26 +5,22 @@ import '../assets/css/MCQ_QuestionNav.css';
 const MCQ_QuestionNav = () => {
     const { 
         questions, 
-        currentQuestionIndex, 
         selectedAnswers,
         dispatch 
     } = useMCQ();
 
-    const handlePrevious = () => {
-        dispatch({ type: ACTIONS.PREV_QUESTION });
-    };
-
-    const handleNext = () => {
-        dispatch({ type: ACTIONS.NEXT_QUESTION });
-    };
-
     const handleSubmit = () => {
-        const answered = Object.keys(selectedAnswers).length;
-        const total = questions.length;
+        const answered = Object.keys(selectedAnswers || {}).length;
+        const total = questions?.length || 0;
 
         if (answered < total) {
             const confirmSubmit = window.confirm(
                 `You have answered ${answered} out of ${total} questions. Do you want to submit?`
+            );
+            if (!confirmSubmit) return;
+        } else {
+            const confirmSubmit = window.confirm(
+                `You have answered all ${total} questions. Do you want to submit?`
             );
             if (!confirmSubmit) return;
         }
@@ -32,33 +28,18 @@ const MCQ_QuestionNav = () => {
         dispatch({ type: ACTIONS.COMPLETE_QUIZ });
     };
 
-    const isFirst = currentQuestionIndex === 0;
-    const isLast = currentQuestionIndex === questions.length - 1;
+    if (!questions || questions.length === 0) {
+        return null;
+    }
 
     return (
         <div className="mcq-nav-container">
             <button
-                className="mcq-nav-btn prev"
-                onClick={handlePrevious}
-                disabled={isFirst}
+                className="mcq-nav-btn submit"
+                onClick={handleSubmit}
             >
-                <i className="bi bi-chevron-left"></i> Previous
+                <i className="bi bi-check-lg"></i> Submit Quiz
             </button>
-            <button
-                className="mcq-nav-btn next"
-                onClick={handleNext}
-                disabled={isLast}
-            >
-                Next <i className="bi bi-chevron-right"></i>
-            </button>
-            {isLast && (
-                <button
-                    className="mcq-nav-btn submit"
-                    onClick={handleSubmit}
-                >
-                    Submit Quiz <i className="bi bi-check-lg"></i>
-                </button>
-            )}
         </div>
     );
 };

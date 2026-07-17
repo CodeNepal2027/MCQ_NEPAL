@@ -5,151 +5,225 @@ import '../assets/css/MCQ_Question.css';
 const MCQ_Question = () => {
     const { 
         questions, 
-        currentQuestionIndex, 
         selectedAnswers,
-        dispatch 
+        dispatch,
+        chapter,
+        branch
     } = useMCQ();
 
-    const [showExplanation, setShowExplanation] = useState(false);
-
-    const currentQuestion = questions[currentQuestionIndex];
-    const selectedAnswer = selectedAnswers[currentQuestion?.id] ?? null;
-
-    const handleAnswerSelect = (answerIndex) => {
-        if (selectedAnswer !== null) return;
-        dispatch({
-            type: ACTIONS.SELECT_ANSWER,
-            payload: { questionId: currentQuestion.id, answerIndex }
-        });
-        setShowExplanation(true);
-    };
+    const [showAnswers, setShowAnswers] = useState({});
+    const [showExplanations, setShowExplanations] = useState({});
 
     const optionLabels = ['A', 'B', 'C', 'D'];
 
-    if (!currentQuestion) {
+    const handleAnswerSelect = (questionId, answerIndex) => {
+        if (selectedAnswers[questionId] !== undefined) return;
+        dispatch({
+            type: 'SELECT_ANSWER',
+            payload: { questionId, answerIndex }
+        });
+    };
+
+    const toggleAnswer = (questionId) => {
+        setShowAnswers(prev => ({
+            ...prev,
+            [questionId]: !prev[questionId]
+        }));
+    };
+
+    const toggleExplanation = (questionId) => {
+        setShowExplanations(prev => ({
+            ...prev,
+            [questionId]: !prev[questionId]
+        }));
+    };
+
+    const handleBackToChapters = () => {
+        dispatch({ type: ACTIONS.SELECT_CHAPTER, payload: null });
+    };
+
+    if (!questions || questions.length === 0) {
         return (
             <div className="mcq-question-empty">
                 <i className="bi bi-inbox-fill"></i>
-                <p>No question found</p>
+                <p>No questions found</p>
             </div>
         );
     }
 
+    // Calculate progress
+    const answeredCount = Object.keys(selectedAnswers).length;
+    const totalQuestions = questions.length;
+    const progress = (answeredCount / totalQuestions) * 100;
+
     return (
         <div className="mcq-question-container">
-            {/* Question Header */}
-            <div className="mcq-question-header">
-                <div className="question-number">
-                    <span className="number-badge">
-                        <i className="bi bi-hash"></i>
-                        {currentQuestionIndex + 1}
+            {/* Back Button Header */}
+            <div className="mcq-question-header-top">
+                <button onClick={handleBackToChapters} className="mcq-back-btn">
+                    <i className="bi bi-arrow-left"></i> Back to Chapters
+                </button>
+                <div className="header-info">
+                    <span className="chapter-name">
+                        <i className="bi bi-book-fill"></i>
+                        {chapter?.name || 'Questions'}
                     </span>
-                    <span className="total-questions">
-                        of {questions.length} questions
+                    <span className="branch-name">
+                        <i className="bi bi-folder-fill"></i>
+                        {branch?.name || ''}
                     </span>
-                </div>
-                <div className="question-status">
-                    {selectedAnswer !== null ? (
-                        <span className="status-answered">
-                            <i className="bi bi-check-circle-fill"></i> Answered
-                        </span>
-                    ) : (
-                        <span className="status-unanswered">
-                            <i className="bi bi-circle"></i> Unanswered
-                        </span>
-                    )}
                 </div>
             </div>
 
-            {/* Question Text */}
-            <div className="mcq-question-text">
-                <p>{currentQuestion.question}</p>
+            {/* Progress Header */}
+            <div className="mcq-progress-header">
+                <div className="mcq-progress-info">
+                    <span className="mcq-progress-title">
+                        <i className="bi bi-journal-text"></i> Practice Questions
+                    </span>
+                    <span className="mcq-progress-count">
+                        {answeredCount} / {totalQuestions} Answered
+                    </span>
+                </div>
+                <div className="mcq-progress-bar-wrapper">
+                    <div className="mcq-progress-bar">
+                        <div 
+                            className="mcq-progress-fill" 
+                            style={{ width: `${progress}%` }}
+                        ></div>
+                    </div>
+                    <span className="mcq-progress-percentage">
+                        {Math.round(progress)}%
+                    </span>
+                </div>
             </div>
 
-            {/* Options */}
-            <div className="mcq-options">
-                {currentQuestion.options.map((option, index) => {
-                    const isSelected = selectedAnswer === index;
-                    const isCorrect = index === currentQuestion.correctAnswer;
-                    const showResult = selectedAnswer !== null;
-
-                    let className = 'mcq-option';
-                    if (showResult) {
-                        if (isCorrect) className += ' correct';
-                        if (isSelected && !isCorrect) className += ' wrong';
-                        if (isSelected) className += ' selected';
-                    } else if (isSelected) {
-                        className += ' selected';
-                    }
-
-                    const letterColors = ['#dc2626', '#2563eb', '#16a34a', '#d97706'];
+            {/* All Questions */}
+            <div className="mcq-questions-list">
+                {questions.map((question, index) => {
+                    const selectedAnswer = selectedAnswers[question.id] ?? null;
+                    const showAnswer = showAnswers[question.id] || false;
+                    const showExplanation = showExplanations[question.id] || false;
 
                     return (
-                        <div
-                            key={index}
-                            className={className}
-                            onClick={() => handleAnswerSelect(index)}
-                        >
-                            <span 
-                                className="mcq-option-label"
-                                style={{ 
-                                    background: isSelected ? letterColors[index] : 'var(--bg-main-2)',
-                                    color: isSelected ? '#fff' : 'var(--text-color-2)'
-                                }}
-                            >
-                                {optionLabels[index]}
-                            </span>
-                            <span className="mcq-option-text">{option}</span>
-                            {showResult && isCorrect && (
-                                <i className="bi bi-check-circle-fill mcq-option-icon correct-icon"></i>
-                            )}
-                            {showResult && isSelected && !isCorrect && (
-                                <i className="bi bi-x-circle-fill mcq-option-icon wrong-icon"></i>
+                        <div key={question.id} className="mcq-question-item">
+                            {/* Question Number */}
+                            <div className="mcq-question-number">
+                                <span className="q-number">Question {index + 1}</span>
+                                <span className={`q-status ${selectedAnswer !== null ? 'answered' : 'unanswered'}`}>
+                                    {selectedAnswer !== null ? (
+                                        <><i className="bi bi-check-circle-fill"></i> Answered</>
+                                    ) : (
+                                        <><i className="bi bi-circle"></i> Unanswered</>
+                                    )}
+                                </span>
+                            </div>
+
+                            {/* Question Text */}
+                            <div className="mcq-question-text">
+                                <p>{question.question}</p>
+                            </div>
+
+                            {/* Options */}
+                            <div className="mcq-options">
+                                {question.options.map((option, optIndex) => {
+                                    const isSelected = selectedAnswer === optIndex;
+                                    const isCorrect = optIndex === question.correctAnswer;
+                                    const showResult = showAnswer;
+
+                                    let className = 'mcq-option';
+                                    if (isSelected) className += ' selected';
+                                    if (showResult) {
+                                        if (isCorrect) className += ' correct';
+                                        if (isSelected && !isCorrect) className += ' wrong';
+                                    }
+
+                                    const letterColors = ['#dc2626', '#2563eb', '#16a34a', '#d97706'];
+
+                                    return (
+                                        <div
+                                            key={optIndex}
+                                            className={className}
+                                            onClick={() => handleAnswerSelect(question.id, optIndex)}
+                                        >
+                                            <span 
+                                                className="mcq-option-label"
+                                                style={{ 
+                                                    background: isSelected ? letterColors[optIndex] : 'var(--bg-main-2)',
+                                                    color: isSelected ? '#fff' : 'var(--text-color-2)'
+                                                }}
+                                            >
+                                                {optionLabels[optIndex]}
+                                            </span>
+                                            <span className="mcq-option-text">{option}</span>
+                                            {showResult && isCorrect && (
+                                                <i className="bi bi-check-circle-fill mcq-option-icon correct-icon"></i>
+                                            )}
+                                            {showResult && isSelected && !isCorrect && (
+                                                <i className="bi bi-x-circle-fill mcq-option-icon wrong-icon"></i>
+                                            )}
+                                        </div>
+                                    );
+                                })}
+                            </div>
+
+                            {/* Action Buttons */}
+                            <div className="mcq-question-actions">
+                                <button 
+                                    className={`mcq-action-btn ${showAnswer ? 'active' : ''}`}
+                                    onClick={() => toggleAnswer(question.id)}
+                                >
+                                    <i className={`bi ${showAnswer ? 'bi-eye-slash-fill' : 'bi-eye-fill'}`}></i>
+                                    {showAnswer ? 'Hide Answer' : 'Show Answer'}
+                                </button>
+                                <button 
+                                    className={`mcq-action-btn ${showExplanation ? 'active' : ''}`}
+                                    onClick={() => toggleExplanation(question.id)}
+                                    disabled={!showAnswer}
+                                >
+                                    <i className={`bi ${showExplanation ? 'bi-x-circle-fill' : 'bi-lightbulb-fill'}`}></i>
+                                    {showExplanation ? 'Hide Explanation' : 'Show Explanation'}
+                                </button>
+                            </div>
+
+                            {/* Explanation */}
+                            {showAnswer && showExplanation && (
+                                <div className="mcq-explanation">
+                                    <div className="mcq-explanation-header">
+                                        <span className={`mcq-explanation-badge ${selectedAnswer === question.correctAnswer ? 'correct' : 'incorrect'}`}>
+                                            {selectedAnswer !== null && selectedAnswer === question.correctAnswer ? (
+                                                <>
+                                                    <i className="bi bi-check-circle-fill"></i> Your Answer: Correct!
+                                                </>
+                                            ) : selectedAnswer !== null ? (
+                                                <>
+                                                    <i className="bi bi-x-circle-fill"></i> Your Answer: Incorrect
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <i className="bi bi-info-circle-fill"></i> Correct Answer
+                                                </>
+                                            )}
+                                        </span>
+                                    </div>
+                                    <div className="mcq-explanation-content">
+                                        <div className="explanation-row">
+                                            <span className="explanation-label">Correct Answer:</span>
+                                            <span className="explanation-value correct-text">
+                                                {optionLabels[question.correctAnswer]}. {question.options[question.correctAnswer]}
+                                            </span>
+                                        </div>
+                                        <div className="explanation-divider"></div>
+                                        <p className="mcq-explanation-text">
+                                            <span className="explanation-label">Explanation:</span>
+                                            {question.explanation}
+                                        </p>
+                                    </div>
+                                </div>
                             )}
                         </div>
                     );
                 })}
-            </div>
-
-            {/* Explanation */}
-            {selectedAnswer !== null && showExplanation && (
-                <div className="mcq-explanation">
-                    <div className="mcq-explanation-header">
-                        <span className={`mcq-explanation-badge ${selectedAnswer === currentQuestion.correctAnswer ? 'correct' : 'incorrect'}`}>
-                            {selectedAnswer === currentQuestion.correctAnswer ? (
-                                <>
-                                    <i className="bi bi-check-circle-fill"></i> Correct!
-                                </>
-                            ) : (
-                                <>
-                                    <i className="bi bi-x-circle-fill"></i> Incorrect
-                                </>
-                            )}
-                        </span>
-                        <button 
-                            className="explanation-toggle"
-                            onClick={() => setShowExplanation(!showExplanation)}
-                        >
-                            <i className={`bi ${showExplanation ? 'bi-chevron-up' : 'bi-chevron-down'}`}></i>
-                        </button>
-                    </div>
-                    <div className="mcq-explanation-content">
-                        <p className="mcq-explanation-text">{currentQuestion.explanation}</p>
-                    </div>
-                </div>
-            )}
-
-            {/* Progress Indicator */}
-            <div className="mcq-question-footer">
-                <div className="question-progress-dots">
-                    {questions.map((q, index) => (
-                        <span 
-                            key={q.id}
-                            className={`progress-dot ${index === currentQuestionIndex ? 'active' : ''} ${selectedAnswers[q.id] !== undefined ? 'answered' : ''}`}
-                            onClick={() => dispatch({ type: ACTIONS.JUMP_TO_QUESTION, payload: index })}
-                        />
-                    ))}
-                </div>
             </div>
         </div>
     );

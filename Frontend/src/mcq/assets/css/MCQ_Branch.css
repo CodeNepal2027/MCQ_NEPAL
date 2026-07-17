@@ -1,16 +1,15 @@
 /* ============================================
-   MCQ SUB-CATEGORY - PROFESSIONAL DESIGN
+   MCQ BRANCH - PROFESSIONAL DESIGN
    ============================================ */
 
-.mcq-subcategory-container {
-    max-width: 900px;
+.mcq-branch-container {
+    /* max-width: 1000px; */
     margin: 0 auto;
-    padding: 5px;
+    padding: 20px;
     animation: fadeIn 0.4s ease;
 }
 
-/* ----- Header ----- */
-.mcq-subcategory-header {
+.mcq-branch-header {
     margin-bottom: 32px;
 }
 
@@ -48,19 +47,32 @@
 }
 
 .header-icon {
-    font-size: 48px;
+    font-size: 36px;
     line-height: 1;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-main-2);
+    border-radius: 50%;
+    border: 2px solid var(--border-color);
 }
 
-.mcq-subcategory-title {
-    font-size: 30px;
+.header-icon i {
+    font-size: 24px;
+    color: var(--theme-icon-color);
+}
+
+.mcq-branch-title {
+    font-size: 28px;
     font-weight: 800;
     color: var(--text-color-1);
     letter-spacing: -0.02em;
     margin-bottom: 2px;
 }
 
-.mcq-subcategory-subtitle {
+.mcq-branch-subtitle {
     font-size: 15px;
     color: var(--text-color-3);
     display: flex;
@@ -68,20 +80,20 @@
     gap: 6px;
 }
 
-.mcq-subcategory-subtitle i {
+.mcq-branch-subtitle i {
     font-size: 14px;
     color: var(--theme-icon-color);
 }
 
 /* ----- Grid ----- */
-.mcq-subcategory-grid {
+.mcq-branch-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: 20px;
 }
 
 /* ----- Card ----- */
-.mcq-subcategory-card {
+.mcq-branch-card {
     background: var(--bg-main-1);
     padding: 28px 20px 24px;
     border-radius: var(--radius-lg);
@@ -93,7 +105,7 @@
     overflow: hidden;
 }
 
-.mcq-subcategory-card::after {
+.mcq-branch-card::after {
     content: '';
     position: absolute;
     bottom: 0;
@@ -105,41 +117,61 @@
     transition: width 0.4s ease;
 }
 
-.mcq-subcategory-card:hover::after {
+.mcq-branch-card:hover::after {
     width: 80%;
 }
 
-.mcq-subcategory-card:hover {
+.mcq-branch-card:hover {
     transform: translateY(-6px);
     border-color: transparent;
     box-shadow: var(--shadow-lg);
 }
 
-.subcard-icon {
-    font-size: 36px;
+.branch-icon {
+    font-size: 32px;
     margin-bottom: 12px;
-    /* display: inline-block; */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    margin-left: auto;
+    margin-right: auto;
+    background: var(--bg-main-2);
+    border-radius: 50%;
+    border: 2px solid var(--border-color);
+    transition: all 0.3s ease;
 }
 
-.mcq-subcategory-name {
+.branch-icon i {
+    font-size: 22px;
+    color: var(--theme-icon-color);
+}
+
+.mcq-branch-card:hover .branch-icon {
+    border-color: var(--theme-icon-color);
+    transform: scale(1.05);
+}
+
+.mcq-branch-name {
     font-size: 18px;
     font-weight: 700;
     color: var(--text-color-1);
     margin-bottom: 6px;
 }
 
-.mcq-subcategory-desc {
+.mcq-branch-desc {
     font-size: 13px;
     color: var(--text-color-3);
     margin-bottom: 14px;
     line-height: 1.5;
 }
 
-.mcq-subcategory-meta {
+.mcq-branch-meta {
     margin-bottom: 14px;
 }
 
-.sub-meta {
+.branch-meta {
     display: inline-flex;
     align-items: center;
     gap: 5px;
@@ -152,12 +184,12 @@
     border: 1px solid var(--border-color);
 }
 
-.sub-meta i {
+.branch-meta i {
     font-size: 12px;
     color: var(--theme-icon-color);
 }
 
-.mcq-subcategory-start {
+.mcq-branch-start {
     font-size: 14px;
     font-weight: 600;
     color: var(--theme-icon-color);
@@ -167,21 +199,21 @@
     gap: 6px;
 }
 
-.mcq-subcategory-card:hover .mcq-subcategory-start {
+.mcq-branch-card:hover .mcq-branch-start {
     transform: translateX(4px);
 }
 
-.mcq-subcategory-start i {
+.mcq-branch-start i {
     font-size: 18px;
     transition: transform 0.3s ease;
 }
 
-.mcq-subcategory-card:hover .mcq-subcategory-start i {
+.mcq-branch-card:hover .mcq-branch-start i {
     transform: translateX(4px);
 }
 
 /* ----- Error State ----- */
-.mcq-subcategory-error {
+.mcq-branch-error {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -191,13 +223,13 @@
     text-align: center;
 }
 
-.mcq-subcategory-error i {
+.mcq-branch-error i {
     font-size: 48px;
     color: var(--theme-icon-color);
     opacity: 0.5;
 }
 
-.mcq-subcategory-error p {
+.mcq-branch-error p {
     font-size: 18px;
     color: var(--text-color-1);
     font-weight: 600;
@@ -208,11 +240,11 @@
    ============================================ */
 
 @media (max-width: 768px) {
-    .mcq-subcategory-container {
-        padding: 8px;
+    .mcq-branch-container {
+        padding: 12px;
     }
 
-    .mcq-subcategory-title {
+    .mcq-branch-title {
         font-size: 24px;
     }
 
@@ -221,56 +253,71 @@
     }
 
     .header-icon {
-        font-size: 36px;
+        width: 48px;
+        height: 48px;
     }
 
-    .mcq-subcategory-grid {
+    .header-icon i {
+        font-size: 20px;
+    }
+
+    .mcq-branch-grid {
         grid-template-columns: 1fr 1fr;
-        gap: 16px;
+        gap: 10px;
     }
 
-    .mcq-subcategory-card {
+    .mcq-branch-card {
         padding: 20px 16px 18px;
     }
 }
 
 @media (max-width: 480px) {
-    .mcq-subcategory-container {
-        padding: 4px;
+    .mcq-branch-container {
+        padding: 8px;
     }
 
-    .mcq-subcategory-title {
+    .mcq-branch-title {
         font-size: 20px;
     }
 
-    .mcq-subcategory-subtitle {
+    .mcq-branch-subtitle {
         font-size: 13px;
     }
 
     .header-icon {
-        font-size: 28px;
+        width: 40px;
+        height: 40px;
     }
 
-    .mcq-subcategory-grid {
-        grid-template-columns: 1fr;
-        gap: 14px;
-        max-width: 320px;
-        margin: 0 auto;
-    }
-
-    .mcq-subcategory-card {
-        padding: 18px 14px 16px;
-    }
-
-    .subcard-icon {
-        font-size: 28px;
-    }
-
-    .mcq-subcategory-name {
+    .header-icon i {
         font-size: 16px;
     }
 
-    .mcq-subcategory-desc {
+    .mcq-branch-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 2px;
+        /* max-width: 320px; */
+        margin: 0 auto;
+    }
+
+    .mcq-branch-card {
+        padding: 18px 14px 16px;
+    }
+
+    .branch-icon {
+        width: 44px;
+        height: 44px;
+    }
+
+    .branch-icon i {
+        font-size: 18px;
+    }
+
+    .mcq-branch-name {
+        font-size: 16px;
+    }
+
+    .mcq-branch-desc {
         font-size: 12px;
     }
 
@@ -278,4 +325,36 @@
         font-size: 13px;
         padding: 6px 10px;
     }
+}
+
+
+
+/* Add to MCQ_Branch.css */
+
+/* Loading State */
+.mcq-branch-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+    gap: 16px;
+}
+
+.mcq-branch-loading .mcq-loading-spinner {
+    width: 48px;
+    height: 48px;
+    border: 4px solid var(--border-color);
+    border-top: 4px solid var(--theme-icon-color);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.mcq-branch-loading p {
+    font-size: 16px;
+    color: var(--text-color-3);
 }

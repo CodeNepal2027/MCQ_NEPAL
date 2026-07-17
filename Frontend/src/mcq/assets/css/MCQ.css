@@ -1,7 +1,7 @@
 /* ===== MCQ MAIN ===== */
 .mcq-quiz-wrapper {
     animation: fadeIn 0.4s ease;
-    max-width: 900px;
+    /* max-width: 1000px; */
     margin: 0 auto;
     padding: 20px;
 }
@@ -159,7 +159,10 @@
     font-size: 16px;
 }
 
-/* ===== RESPONSIVE ===== */
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
 @media (max-width: 768px) {
     .mcq-quiz-wrapper {
         padding: 12px;
