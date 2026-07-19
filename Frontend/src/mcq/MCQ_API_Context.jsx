@@ -1,24 +1,58 @@
-import React, { createContext, useContext, useReducer } from 'react';
+import React, { createContext, useContext, useReducer, useEffect } from 'react';
+
+// ============================================
+// HELPER: Get Initial State from localStorage
+// ============================================
+const getInitialState = () => {
+    try {
+        const savedState = localStorage.getItem('mcq_state');
+        if (savedState) {
+            const parsed = JSON.parse(savedState);
+            if (parsed && parsed.selectedCategory) {
+                return {
+                    categories: [],
+                    selectedCategory: parsed.selectedCategory || null,
+                    selectedFaculty: parsed.selectedFaculty || null,
+                    selectedBranch: parsed.selectedBranch || null,
+                    selectedChapter: parsed.selectedChapter || null,
+                    questions: parsed.questions || [],
+                    currentQuestionIndex: parsed.currentQuestionIndex || 0,
+                    totalQuestions: parsed.totalQuestions || 0,
+                    selectedAnswers: parsed.selectedAnswers || {},
+                    quizCompleted: parsed.quizCompleted || false,
+                    score: parsed.score || 0,
+                    isLoading: true, // Set loading to true while we restore state
+                    error: null,
+                    isSubmitting: false
+                };
+            }
+        }
+    } catch (e) {
+        console.warn('Failed to restore MCQ state:', e);
+    }
+    
+    return {
+        categories: [],
+        selectedCategory: null,
+        selectedFaculty: null,
+        selectedBranch: null,
+        selectedChapter: null,
+        questions: [],
+        currentQuestionIndex: 0,
+        totalQuestions: 0,
+        selectedAnswers: {},
+        quizCompleted: false,
+        score: 0,
+        isLoading: false,
+        error: null,
+        isSubmitting: false
+    };
+};
 
 // ============================================
 // INITIAL STATE
 // ============================================
-const initialState = {
-    categories: [],
-    selectedCategory: null,
-    selectedFaculty: null,
-    selectedBranch: null,
-    selectedChapter: null,
-    questions: [],
-    currentQuestionIndex: 0,
-    totalQuestions: 0,
-    selectedAnswers: {},
-    quizCompleted: false,
-    score: 0,
-    isLoading: false,
-    error: null,
-    isSubmitting: false
-};
+const initialState = getInitialState();
 
 // ============================================
 // ACTION TYPES
@@ -44,15 +78,41 @@ export const ACTIONS = {
 };
 
 // ============================================
+// HELPER: Save State to localStorage
+// ============================================
+const saveStateToLocalStorage = (state) => {
+    try {
+        const stateToSave = {
+            selectedCategory: state.selectedCategory,
+            selectedFaculty: state.selectedFaculty,
+            selectedBranch: state.selectedBranch,
+            selectedChapter: state.selectedChapter,
+            questions: state.questions,
+            currentQuestionIndex: state.currentQuestionIndex,
+            totalQuestions: state.totalQuestions,
+            selectedAnswers: state.selectedAnswers,
+            quizCompleted: state.quizCompleted,
+            score: state.score
+        };
+        localStorage.setItem('mcq_state', JSON.stringify(stateToSave));
+    } catch (e) {
+        console.warn('Failed to save MCQ state:', e);
+    }
+};
+
+// ============================================
 // REDUCER
 // ============================================
 const mcqReducer = (state, action) => {
+    let newState;
+    
     switch (action.type) {
         case ACTIONS.SET_CATEGORIES:
-            return { ...state, categories: action.payload, isLoading: false };
+            newState = { ...state, categories: action.payload, isLoading: false };
+            break;
 
         case ACTIONS.SELECT_CATEGORY:
-            return {
+            newState = {
                 ...state,
                 selectedCategory: action.payload,
                 selectedFaculty: null,
@@ -64,11 +124,13 @@ const mcqReducer = (state, action) => {
                 quizCompleted: false,
                 score: 0,
                 totalQuestions: 0,
-                error: null
+                error: null,
+                isLoading: false
             };
+            break;
 
         case ACTIONS.SELECT_FACULTY:
-            return {
+            newState = {
                 ...state,
                 selectedFaculty: action.payload,
                 selectedBranch: null,
@@ -79,11 +141,13 @@ const mcqReducer = (state, action) => {
                 quizCompleted: false,
                 score: 0,
                 totalQuestions: 0,
-                error: null
+                error: null,
+                isLoading: false
             };
+            break;
 
         case ACTIONS.SELECT_BRANCH:
-            return {
+            newState = {
                 ...state,
                 selectedBranch: action.payload,
                 selectedChapter: null,
@@ -93,11 +157,13 @@ const mcqReducer = (state, action) => {
                 quizCompleted: false,
                 score: 0,
                 totalQuestions: 0,
-                error: null
+                error: null,
+                isLoading: false
             };
+            break;
 
         case ACTIONS.SELECT_CHAPTER:
-            return {
+            newState = {
                 ...state,
                 selectedChapter: action.payload,
                 questions: [],
@@ -106,11 +172,13 @@ const mcqReducer = (state, action) => {
                 quizCompleted: false,
                 score: 0,
                 totalQuestions: 0,
-                error: null
+                error: null,
+                isLoading: false
             };
+            break;
 
         case ACTIONS.SET_QUESTIONS:
-            return {
+            newState = {
                 ...state,
                 questions: action.payload,
                 totalQuestions: action.payload.length,
@@ -121,46 +189,53 @@ const mcqReducer = (state, action) => {
                 isLoading: false,
                 error: null
             };
+            break;
 
         case ACTIONS.NEXT_QUESTION:
-            return {
+            newState = {
                 ...state,
                 currentQuestionIndex: Math.min(state.currentQuestionIndex + 1, state.questions.length - 1)
             };
+            break;
 
         case ACTIONS.PREV_QUESTION:
-            return {
+            newState = {
                 ...state,
                 currentQuestionIndex: Math.max(state.currentQuestionIndex - 1, 0)
             };
+            break;
 
         case ACTIONS.JUMP_TO_QUESTION:
-            return {
+            newState = {
                 ...state,
                 currentQuestionIndex: Math.min(Math.max(action.payload, 0), state.questions.length - 1)
             };
+            break;
 
         case ACTIONS.SELECT_ANSWER:
-            return {
+            newState = {
                 ...state,
                 selectedAnswers: {
                     ...state.selectedAnswers,
                     [action.payload.questionId]: action.payload.answerIndex
                 }
             };
+            break;
 
         case ACTIONS.CLEAR_ANSWERS:
-            return { ...state, selectedAnswers: {} };
+            newState = { ...state, selectedAnswers: {} };
+            break;
 
         case ACTIONS.COMPLETE_QUIZ: {
             const correctCount = state.questions.filter(
                 q => state.selectedAnswers[q.id] === q.correctAnswer
             ).length;
-            return { ...state, quizCompleted: true, score: correctCount, isSubmitting: false };
+            newState = { ...state, quizCompleted: true, score: correctCount, isSubmitting: false };
+            break;
         }
 
         case ACTIONS.RESET_QUIZ:
-            return {
+            newState = {
                 ...state,
                 questions: [],
                 currentQuestionIndex: 0,
@@ -168,24 +243,39 @@ const mcqReducer = (state, action) => {
                 quizCompleted: false,
                 score: 0,
                 totalQuestions: 0,
-                error: null
+                error: null,
+                isLoading: false
             };
+            break;
 
         case ACTIONS.SET_LOADING:
-            return { ...state, isLoading: action.payload };
+            newState = { ...state, isLoading: action.payload };
+            break;
 
         case ACTIONS.SET_ERROR:
-            return { ...state, error: action.payload, isLoading: false };
+            newState = { ...state, error: action.payload, isLoading: false };
+            break;
 
         case ACTIONS.CLEAR_ERROR:
-            return { ...state, error: null };
+            newState = { ...state, error: null };
+            break;
 
         case ACTIONS.SET_SUBMITTING:
-            return { ...state, isSubmitting: action.payload };
+            newState = { ...state, isSubmitting: action.payload };
+            break;
 
         default:
-            return state;
+            newState = state;
     }
+    
+    // Save to localStorage whenever state changes (except loading and error states)
+    if (action.type !== ACTIONS.SET_LOADING && 
+        action.type !== ACTIONS.SET_ERROR && 
+        action.type !== ACTIONS.CLEAR_ERROR) {
+        saveStateToLocalStorage(newState);
+    }
+    
+    return newState;
 };
 
 // ============================================
@@ -198,6 +288,33 @@ const MCQ_API_Context = createContext();
 // ============================================
 export const MCQProvider = ({ children }) => {
     const [state, dispatch] = useReducer(mcqReducer, initialState);
+
+    // Load categories on mount if we have a selected category
+    useEffect(() => {
+        const loadSavedCategories = async () => {
+            if (state.categories.length === 0 && state.selectedCategory) {
+                try {
+                    // Set loading state
+                    dispatch({ type: ACTIONS.SET_LOADING, payload: true });
+                    
+                    // Import and fetch categories
+                    const { fetchCategories } = await import('./MCQ_API_Fetch');
+                    const data = await fetchCategories();
+                    
+                    // Set categories and clear loading
+                    dispatch({ type: ACTIONS.SET_CATEGORIES, payload: data });
+                } catch (error) {
+                    console.error('Failed to load categories:', error);
+                    // Set error but don't lose the selected state
+                    dispatch({ type: ACTIONS.SET_ERROR, payload: 'Failed to load categories. Please try again.' });
+                }
+            } else if (state.categories.length > 0) {
+                // If categories are already loaded, ensure loading is false
+                dispatch({ type: ACTIONS.SET_LOADING, payload: false });
+            }
+        };
+        loadSavedCategories();
+    }, []);
 
     // Computed Values
     const getCurrentQuestion = () => {

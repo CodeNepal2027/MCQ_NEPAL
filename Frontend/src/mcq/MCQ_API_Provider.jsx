@@ -9,4 +9,9 @@ const MCQ_API_Provider = ({ children }) => {
     );
 };
 
+// Helper function to clear MCQ state (useful for logout or reset)
+export const clearMCQState = () => {
+    localStorage.removeItem('mcq_state');
+};
+
 export default MCQ_API_Provider;
