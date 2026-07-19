@@ -86,7 +86,7 @@ const mockCategories = [
                         name: 'Electrical Engineering', 
                         description: 'Electrical Engineering Questions',
                         chapters: [
-                            { id: 'ch1', name: 'Chapter 1: Circuits', description: 'Electrical Circuits', questionCount: 2 },
+                            { id: 'ch1', name: 'Chapter 1: Circuits', description: 'Electrical Circuits', questionCount: 3 },
                             { id: 'ch2', name: 'Chapter 2: Machines', description: 'Electrical Machines', questionCount: 0 }
                         ]
                     },
@@ -302,13 +302,14 @@ const mockCategories = [
     }
 ];
 
-// Mock Questions Data - 4-Level structure: category_faculty_branch_chapter
+// Mock Questions Data with Image Support
 const mockQuestions = {
     // ===== CMAT - General - Chapter 1 =====
     'entrance_cmat_general_ch1': [
         {
             id: 1,
             question: 'What is the total number of districts in Nepal?',
+            image: null,
             options: ['75', '77', '78', '80'],
             correctAnswer: 1,
             explanation: 'Nepal has 77 districts as of 2023. The country was divided into 7 provinces and 77 districts after the federal restructuring.'
@@ -316,6 +317,7 @@ const mockQuestions = {
         {
             id: 2,
             question: 'What is the literacy rate of Nepal according to the 2021 census?',
+            image: null,
             options: ['65.4%', '71.2%', '76.3%', '80.5%'],
             correctAnswer: 2,
             explanation: 'According to the 2021 census, Nepal\'s literacy rate is 76.3%. The male literacy rate is 83.6% while female literacy rate is 69.4%.'
@@ -323,6 +325,7 @@ const mockQuestions = {
         {
             id: 3,
             question: 'What is the full form of GDP?',
+            image: null,
             options: ['Gross Domestic Product', 'Gross Development Product', 'Global Domestic Product', 'Gross Domestic Profit'],
             correctAnswer: 0,
             explanation: 'GDP stands for Gross Domestic Product. It is the total monetary value of all finished goods and services produced within a country\'s borders in a specific time period.'
@@ -334,6 +337,7 @@ const mockQuestions = {
         {
             id: 1,
             question: 'What is 15% of 200?',
+            image: null,
             options: ['25', '30', '35', '40'],
             correctAnswer: 1,
             explanation: '15% of 200 = (15/100) × 200 = 30.'
@@ -341,6 +345,7 @@ const mockQuestions = {
         {
             id: 2,
             question: 'What is the square root of 144?',
+            image: null,
             options: ['10', '11', '12', '13'],
             correctAnswer: 2,
             explanation: 'The square root of 144 is 12 because 12 × 12 = 144.'
@@ -352,6 +357,7 @@ const mockQuestions = {
         {
             id: 1,
             question: 'What is the SI unit of force?',
+            image: null,
             options: ['Newton', 'Joule', 'Watt', 'Pascal'],
             correctAnswer: 0,
             explanation: 'The SI unit of force is Newton (N). It is defined as the force required to accelerate a mass of 1 kilogram at a rate of 1 meter per second squared.'
@@ -359,6 +365,7 @@ const mockQuestions = {
         {
             id: 2,
             question: 'What is the binary representation of decimal number 10?',
+            image: null,
             options: ['1000', '1010', '1100', '1110'],
             correctAnswer: 1,
             explanation: 'The binary representation of decimal number 10 is 1010 (2³ × 1 + 2² × 0 + 2¹ × 1 + 2⁰ × 0 = 8 + 0 + 2 + 0 = 10).'
@@ -366,6 +373,7 @@ const mockQuestions = {
         {
             id: 3,
             question: 'Which of the following is the strongest structural material?',
+            image: null,
             options: ['Wood', 'Concrete', 'Steel', 'Plastic'],
             correctAnswer: 2,
             explanation: 'Steel is the strongest structural material with high tensile strength. It has a yield strength of up to 250-550 MPa, making it ideal for construction.'
@@ -377,6 +385,7 @@ const mockQuestions = {
         {
             id: 1,
             question: 'What is the pH value of pure water at 25°C?',
+            image: null,
             options: ['6', '7', '8', '9'],
             correctAnswer: 1,
             explanation: 'Pure water has a pH of 7 at 25°C. This is considered neutral, meaning it has equal concentrations of H+ and OH- ions.'
@@ -384,34 +393,66 @@ const mockQuestions = {
         {
             id: 2,
             question: 'What is the standard density of Ordinary Portland Cement?',
+            image: null,
             options: ['1240 kg/m³', '1440 kg/m³', '1640 kg/m³', '1840 kg/m³'],
             correctAnswer: 1,
             explanation: 'The standard density of Ordinary Portland Cement (OPC) is approximately 1440 kg/m³ (or 90 lb/ft³).'
         }
     ],
     
-    // ===== License - Driving - Four Wheeler - Chapter 1 =====
-    'license_driving_four_wheeler_ch1': [
+    // ===== IOE - Electrical - Chapter 1 (with Circuit Diagrams) =====
+    'entrance_ioe_electrical_ch1': [
         {
             id: 1,
-            question: 'What does a yellow traffic light indicate?',
-            options: ['Stop immediately', 'Go faster', 'Prepare to stop', 'Turn around'],
-            correctAnswer: 2,
-            explanation: 'A yellow traffic light indicates that you should prepare to stop before the light turns red. It is a warning that the signal is about to change from green to red.'
+            question: 'What is the equivalent resistance between points A and B in the circuit shown below?',
+            image: 'https://via.placeholder.com/400x250/1a2332/ffffff?text=Circuit+Diagram+1',
+            options: ['2Ω', '4Ω', '6Ω', '8Ω'],
+            correctAnswer: 1,
+            explanation: 'The circuit shows two 4Ω resistors in parallel. The equivalent resistance of two parallel resistors is (R1 × R2) / (R1 + R2) = (4 × 4) / (4 + 4) = 16/8 = 2Ω. Then this 2Ω is in series with another 2Ω resistor, giving a total of 4Ω.'
         },
         {
             id: 2,
-            question: 'What is the legal blood alcohol concentration (BAC) limit for driving in Nepal?',
-            options: ['0.03%', '0.05%', '0.08%', '0.10%'],
+            question: 'What is the current flowing through the 6Ω resistor in the circuit shown?',
+            image: 'https://via.placeholder.com/400x250/1a2332/ffffff?text=Circuit+Diagram+2',
+            options: ['1A', '2A', '3A', '4A'],
             correctAnswer: 1,
-            explanation: 'The legal blood alcohol concentration (BAC) limit for driving in Nepal is 0.05%. For professional drivers, it is even lower at 0.02%.'
+            explanation: 'Using Ohm\'s Law: Total resistance = 6Ω + 3Ω = 9Ω. Total current = V/R = 18V/9Ω = 2A. The current through the 6Ω resistor is 2A.'
         },
         {
             id: 3,
-            question: 'What is the minimum age for a driving license in Nepal?',
-            options: ['14 years', '16 years', '18 years', '21 years'],
+            question: 'Which of the following is the correct symbol for a diode?',
+            image: 'https://via.placeholder.com/400x200/1a2332/ffffff?text=Diode+Symbols',
+            options: ['A', 'B', 'C', 'D'],
             correctAnswer: 2,
-            explanation: 'The minimum age for a driving license in Nepal is 18 years for cars. For motorcycles, it is 16 years.'
+            explanation: 'Option C shows the correct symbol for a diode. The arrow points in the direction of conventional current flow (anode to cathode).'
+        }
+    ],
+    
+    // ===== License - Driving - Four Wheeler - Chapter 1 (with Traffic Signs) =====
+    'license_driving_four_wheeler_ch1': [
+        {
+            id: 1,
+            question: 'What does the following traffic sign indicate?',
+            image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9d/Nepal_road_sign_A15.svg/960px-Nepal_road_sign_A15.svg.png',
+            options: ['Stop', 'Yield', 'No Entry', 'Speed Limit'],
+            correctAnswer: 0,
+            explanation: 'This is a STOP sign. Drivers must come to a complete stop at the intersection indicated by this sign.'
+        },
+        {
+            id: 2,
+            question: 'What does this traffic sign mean?',
+            image: 'https://via.placeholder.com/200x200/ffff00/000000?text=YIELD+SIGN',
+            options: ['Stop', 'Yield to traffic', 'No parking', 'Speed limit 30 km/h'],
+            correctAnswer: 1,
+            explanation: 'This is a YIELD sign. Drivers must yield the right-of-way to oncoming traffic and pedestrians.'
+        },
+        {
+            id: 3,
+            question: 'What is the meaning of this road sign?',
+            image: 'https://via.placeholder.com/200x200/0000ff/ffffff?text=NO+PARKING',
+            options: ['Parking allowed', 'No parking', 'Speed limit', 'No entry'],
+            correctAnswer: 1,
+            explanation: 'This sign indicates NO PARKING. Parking is prohibited in the area indicated by this sign.'
         }
     ],
     
@@ -419,17 +460,19 @@ const mockQuestions = {
     'license_driving_two_wheeler_ch1': [
         {
             id: 1,
-            question: 'What is the minimum age for a motorcycle driving license in Nepal?',
-            options: ['14 years', '16 years', '18 years', '21 years'],
-            correctAnswer: 1,
-            explanation: 'The minimum age for a motorcycle driving license in Nepal is 16 years.'
+            question: 'What does the following traffic sign indicate for two-wheelers?',
+            image: 'https://via.placeholder.com/200x200/ff6600/ffffff?text=BIKE+LANE',
+            options: ['Cycle lane', 'Motorcycle parking', 'Motorcycle lane', 'No entry for bikes'],
+            correctAnswer: 2,
+            explanation: 'This sign indicates a dedicated motorcycle lane. Two-wheelers should use this lane for safer travel.'
         },
         {
             id: 2,
-            question: 'How many mirrors must a motorcycle have?',
-            options: ['At least 1', 'At least 2', 'Optional', 'None required'],
+            question: 'What is the meaning of this sign?',
+            image: 'https://via.placeholder.com/200x200/ff0000/ffffff?text=NO+U-TURN',
+            options: ['U-turn allowed', 'No U-turn', 'Turn left', 'Turn right'],
             correctAnswer: 1,
-            explanation: 'A motorcycle must have at least 2 rearview mirrors for safe driving.'
+            explanation: 'This sign indicates NO U-TURN. Making a U-turn at this location is prohibited.'
         }
     ],
     
@@ -438,6 +481,7 @@ const mockQuestions = {
         {
             id: 1,
             question: 'Which organization regulates engineering practice in Nepal?',
+            image: null,
             options: ['Nepal Engineering Council', 'Ministry of Education', 'Nepal Architects Association', 'Engineering Association of Nepal'],
             correctAnswer: 0,
             explanation: 'The Nepal Engineering Council (NEC) regulates engineering practice in Nepal. It was established by the Nepal Engineering Council Act 2055 (1998).'
@@ -445,6 +489,7 @@ const mockQuestions = {
         {
             id: 2,
             question: 'What is the minimum compressive strength of M20 grade concrete?',
+            image: null,
             options: ['15 MPa', '20 MPa', '25 MPa', '30 MPa'],
             correctAnswer: 1,
             explanation: 'The minimum compressive strength of M20 grade concrete is 20 MPa at 28 days of curing.'
@@ -560,6 +605,7 @@ export const fetchQuestions = async (categoryId, facultyId, branchId, chapterId)
             {
                 id: 1,
                 question: 'What is the capital of Nepal?',
+                image: null,
                 options: ['Kathmandu', 'Pokhara', 'Bhaktapur', 'Lalitpur'],
                 correctAnswer: 0,
                 explanation: 'Kathmandu is the capital city of Nepal, located in the Kathmandu Valley.'
@@ -567,6 +613,7 @@ export const fetchQuestions = async (categoryId, facultyId, branchId, chapterId)
             {
                 id: 2,
                 question: 'Which is the highest mountain in the world located in Nepal?',
+                image: null,
                 options: ['Kanchenjunga', 'Lhotse', 'Mount Everest', 'Makalu'],
                 correctAnswer: 2,
                 explanation: 'Mount Everest (Sagarmatha) is the highest mountain in the world at 8,848.86 meters.'
@@ -574,6 +621,7 @@ export const fetchQuestions = async (categoryId, facultyId, branchId, chapterId)
             {
                 id: 3,
                 question: 'When was the Federal Republic of Nepal declared?',
+                image: null,
                 options: ['2006 May 28', '2008 May 28', '2010 May 28', '2015 May 28'],
                 correctAnswer: 1,
                 explanation: 'Nepal was declared a Federal Republic on May 28, 2008.'

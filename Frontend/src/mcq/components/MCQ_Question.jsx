@@ -124,6 +124,26 @@ const MCQ_Question = () => {
                                 <p>{question.question}</p>
                             </div>
 
+                            {/* Question Image - New Feature */}
+                            {question.image && (
+                                <div className="mcq-question-image">
+                                    <img 
+                                        src={question.image} 
+                                        alt="Question diagram" 
+                                        className="mcq-image"
+                                        loading="lazy"
+                                        onError={(e) => {
+                                            e.target.style.display = 'none';
+                                            const parent = e.target.parentElement;
+                                            const errorDiv = document.createElement('div');
+                                            errorDiv.className = 'mcq-image-error';
+                                            errorDiv.innerHTML = '<i class="bi bi-image-fill"></i> Image not available';
+                                            parent.appendChild(errorDiv);
+                                        }}
+                                    />
+                                </div>
+                            )}
+
                             {/* Options */}
                             <div className="mcq-options">
                                 {question.options.map((option, optIndex) => {
