@@ -1,0 +1,333 @@
+/* ===== MCQ RESULT ===== */
+.mcq-result-container {
+    /* max-width: 800px; */
+    margin: 0 auto;
+    padding: 20px;
+    animation: fadeIn 0.4s ease;
+}
+
+.mcq-result-header {
+    text-align: center;
+    margin-bottom: 28px;
+}
+
+.mcq-result-title {
+    font-size: 32px;
+    font-weight: 800;
+    color: var(--text-color-1);
+    margin-bottom: 6px;
+}
+
+.mcq-result-message {
+    font-size: 17px;
+    color: var(--text-color-2);
+}
+
+.mcq-result-score {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 28px;
+}
+
+.mcq-score-circle {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+}
+
+.mcq-score-number {
+    font-size: 56px;
+    font-weight: 800;
+    color: var(--text-color-1);
+}
+
+.mcq-score-total {
+    font-size: 24px;
+    color: var(--text-color-3);
+}
+
+.mcq-score-percentage {
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.mcq-score-percentage.score-high {
+    color: var(--success-color);
+}
+
+.mcq-score-percentage.score-medium {
+    color: var(--warning-color);
+}
+
+.mcq-score-percentage.score-low {
+    color: var(--error-color);
+}
+
+.mcq-result-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 28px;
+}
+
+.mcq-stat-item {
+    text-align: center;
+    padding: 16px;
+    background: var(--bg-main-2);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
+}
+
+.mcq-stat-value {
+    display: block;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text-color-1);
+}
+
+.mcq-stat-label {
+    font-size: 13px;
+    color: var(--text-color-3);
+}
+
+.mcq-stat-item.correct .mcq-stat-value {
+    color: var(--success-color);
+}
+
+.mcq-stat-item.incorrect .mcq-stat-value {
+    color: var(--error-color);
+}
+
+.mcq-stat-item.accuracy .mcq-stat-value {
+    color: var(--theme-icon-color);
+}
+
+.mcq-result-actions {
+    display: flex;
+    gap: 14px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 32px;
+}
+
+.mcq-action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 28px;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition);
+}
+
+.mcq-action-btn.retry {
+    background: var(--primary-gradient);
+    color: #fff;
+    box-shadow: 0 4px 20px rgba(178, 38, 220, 0.3);
+}
+
+.mcq-action-btn.retry:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(178, 38, 220, 0.4);
+}
+
+.mcq-action-btn.back {
+    background: var(--bg-main-2);
+    color: var(--text-color-2);
+    border: 1px solid var(--border-color);
+}
+
+.mcq-action-btn.back:hover {
+    background: var(--bg-main-3);
+    transform: translateY(-2px);
+}
+
+/* ===== MCQ REVIEW ===== */
+.mcq-result-review {
+    margin-top: 8px;
+}
+
+.mcq-review-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text-color-1);
+    margin-bottom: 16px;
+}
+
+.mcq-review-item {
+    background: var(--bg-main-1);
+    padding: 20px 24px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
+    margin-bottom: 16px;
+}
+
+.mcq-review-item.review-correct {
+    border-left: 4px solid var(--success-color);
+}
+
+.mcq-review-item.review-incorrect {
+    border-left: 4px solid var(--error-color);
+}
+
+.mcq-review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.mcq-review-number {
+    font-weight: 700;
+    color: var(--text-color-1);
+}
+
+.mcq-review-status {
+    font-size: 18px;
+}
+
+.mcq-review-question {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-color-1);
+    margin-bottom: 8px;
+}
+
+.mcq-review-answers {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 10px;
+}
+
+.mcq-review-answer {
+    font-size: 14px;
+    color: var(--text-color-2);
+}
+
+.mcq-review-answer.correct-answer {
+    color: var(--success-color);
+}
+
+.mcq-review-answer.user-answer {
+    color: var(--error-color);
+}
+
+.mcq-review-answer.skipped-answer {
+    color: var(--warning-color);
+}
+
+.mcq-review-explanation {
+    font-size: 14px;
+    color: var(--text-color-3);
+    line-height: 1.6;
+    padding-top: 10px;
+    border-top: 1px solid var(--border-color);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+    .mcq-result-container {
+        padding: 12px;
+    }
+
+    .mcq-result-title {
+        font-size: 26px;
+    }
+
+    .mcq-score-number {
+        font-size: 44px;
+    }
+
+    .mcq-score-percentage {
+        font-size: 24px;
+    }
+
+    .mcq-result-stats {
+        gap: 12px;
+    }
+
+    .mcq-stat-value {
+        font-size: 20px;
+    }
+
+    .mcq-result-actions {
+        gap: 10px;
+    }
+
+    .mcq-action-btn {
+        padding: 10px 20px;
+        font-size: 14px;
+    }
+
+    .mcq-review-item {
+        padding: 16px 18px;
+    }
+}
+
+@media (max-width: 480px) {
+    .mcq-result-title {
+        font-size: 22px;
+    }
+
+    .mcq-result-message {
+        font-size: 15px;
+    }
+
+    .mcq-score-number {
+        font-size: 36px;
+    }
+
+    .mcq-score-total {
+        font-size: 18px;
+    }
+
+    .mcq-score-percentage {
+        font-size: 20px;
+    }
+
+    .mcq-result-stats {
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 8px;
+    }
+
+    .mcq-stat-item {
+        padding: 12px 8px;
+    }
+
+    .mcq-stat-value {
+        font-size: 18px;
+    }
+
+    .mcq-action-btn {
+        padding: 10px 16px;
+        font-size: 13px;
+        flex: 1;
+        justify-content: center;
+    }
+
+    .mcq-result-actions {
+        flex-direction: column;
+    }
+
+    .mcq-review-item {
+        padding: 14px 12px;
+    }
+
+    .mcq-review-question {
+        font-size: 14px;
+    }
+
+    .mcq-review-answer {
+        font-size: 13px;
+    }
+
+    .mcq-review-explanation {
+        font-size: 13px;
+    }
+}

@@ -1,0 +1,73 @@
+/* ============================================
+   MCQ QUESTION NAV - SUBMIT BUTTON
+   ============================================ */
+
+.mcq-nav-container {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    padding: 20px 0 10px;
+    margin-top: 10px;
+}
+
+.mcq-nav-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 40px;
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: 17px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all var(--transition);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.mcq-nav-btn.submit {
+    background: var(--primary-gradient);
+    color: #fff;
+    box-shadow: 0 4px 20px rgba(178, 38, 220, 0.3);
+}
+
+.mcq-nav-btn.submit:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 35px rgba(178, 38, 220, 0.4);
+}
+
+.mcq-nav-btn.submit:active {
+    transform: translateY(0);
+}
+
+.mcq-nav-btn i {
+    font-size: 20px;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 768px) {
+    .mcq-nav-container {
+        padding: 16px 0 8px;
+    }
+
+    .mcq-nav-btn {
+        padding: 12px 32px;
+        font-size: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .mcq-nav-container {
+        padding: 12px 0 6px;
+    }
+
+    .mcq-nav-btn {
+        padding: 12px 24px;
+        font-size: 15px;
+        width: 100%;
+        justify-content: center;
+    }
+}
