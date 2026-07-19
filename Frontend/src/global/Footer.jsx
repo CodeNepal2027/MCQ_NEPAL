@@ -111,7 +111,7 @@ const Footer = () => {
                 <div className="footer-bottom">
                     <div className="footer-bottom-content">
                         <p className="footer-copyright">
-                            &copy; {currentYear} <span className="copyright-brand">Nepal MCQ Hub</span>. 
+                            &copy; {currentYear} <span className="copyright-brand">CodeNepal2027</span>. 
                             All rights reserved.
                         </p>
                         <p className="footer-credit">

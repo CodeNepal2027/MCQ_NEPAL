@@ -23,8 +23,7 @@ const MCQ = () => {
         quizCompleted,
         isLoading,
         error,
-        dispatch,
-        selectedAnswers
+        dispatch
     } = useMCQ();
 
     const [loadingMessage, setLoadingMessage] = useState('Loading...');
@@ -34,11 +33,31 @@ const MCQ = () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    // Load categories on mount
+    // Load categories on mount - check if we have saved state first
     useEffect(() => {
         const loadCategories = async () => {
-            if (categories.length > 0) return;
+            // If we already have categories, don't reload
+            if (categories.length > 0) {
+                dispatch({ type: ACTIONS.SET_LOADING, payload: false });
+                return;
+            }
             
+            // Check if we have a saved selection
+            const savedState = localStorage.getItem('mcq_state');
+            if (savedState) {
+                try {
+                    const parsed = JSON.parse(savedState);
+                    if (parsed.selectedCategory) {
+                        // We have a saved category, but categories are already being loaded by the provider
+                        // Just wait for them
+                        return;
+                    }
+                } catch (e) {
+                    console.warn('Failed to parse saved state:', e);
+                }
+            }
+            
+            // No saved state or no categories, load categories
             dispatch({ type: ACTIONS.SET_LOADING, payload: true });
             setLoadingMessage('Loading categories...');
             
@@ -57,8 +76,8 @@ const MCQ = () => {
         scrollToTop();
     }, [selectedCategory, selectedFaculty, selectedBranch, selectedChapter, quizCompleted]);
 
-    // Show loading state
-    if (isLoading && categories.length === 0) {
+    // Show loading state - with better handling
+    if (isLoading) {
         return (
             <div className="mcq-loading-container">
                 <div className="mcq-loading-spinner"></div>
@@ -116,17 +135,6 @@ const MCQ = () => {
             <div className="mcq-quiz-wrapper">
                 <MCQ_Question />
                 <MCQ_QuestionNav />
-            </div>
-        );
-    }
-
-    // Loading questions
-    if (isLoading) {
-        return (
-            <div className="mcq-loading-container">
-                <div className="mcq-loading-spinner"></div>
-                <p className="mcq-loading-text">Loading questions...</p>
-                <p className="mcq-loading-subtext">Getting your practice questions ready</p>
             </div>
         );
     }
