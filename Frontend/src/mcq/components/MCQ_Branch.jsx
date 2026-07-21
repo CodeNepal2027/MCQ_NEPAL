@@ -1,44 +1,67 @@
 import React, { useEffect } from 'react';
 import { useMCQ, ACTIONS } from '../MCQ_API_Context';
-import { fetchBranches } from '../MCQ_API_Fetch';
+import { fetchBranchesByFaculty } from '../MCQ_API_Fetch';
 import '../assets/css/MCQ_Branch.css';
 
 const MCQ_Branch = () => {
     const { 
-        selectedCategory, 
         selectedFaculty,
-        category,
+        dispatch,
         faculty,
-        dispatch 
+        isLoading,
+        category,
+        selectedCategory,
+        categories
     } = useMCQ();
 
     // Load branches if not already loaded
     useEffect(() => {
         const loadBranches = async () => {
-            if (selectedCategory && selectedFaculty && !faculty?.branches) {
+            if (selectedFaculty && !faculty?.branches) {
                 dispatch({ type: ACTIONS.SET_LOADING, payload: true });
                 try {
-                    const branches = await fetchBranches(selectedCategory, selectedFaculty);
+                    console.log('📡 Loading branches for faculty:', selectedFaculty);
+                    const branches = await fetchBranchesByFaculty(selectedFaculty);
+                    console.log('📦 Branches loaded:', branches);
+                    
                     // Update the faculty with branches
+                    const updatedFaculty = { ...faculty, branches };
+                    
+                    // Update the faculty in the categories state
+                    // Method 1: Using UPDATE_FACULTY action
+                    dispatch({ 
+                        type: ACTIONS.UPDATE_FACULTY, 
+                        payload: { facultyId: selectedFaculty, facultyData: updatedFaculty } 
+                    });
+                    
+                    // Method 2: Direct update (fallback)
+                    // Also update categories directly to be safe
                     const updatedCategory = { ...category };
-                    const updatedFaculties = updatedCategory.faculties.map(f => 
-                        f.id === selectedFaculty ? { ...f, branches } : f
-                    );
+                    const updatedFaculties = updatedCategory.faculties?.map(f => 
+                        f.id === selectedFaculty ? updatedFaculty : f
+                    ) || [];
                     updatedCategory.faculties = updatedFaculties;
                     
-                    // Update categories in state
-                    const updatedCategories = category.categories?.map(c => 
+                    const updatedCategories = categories.map(c => 
                         c.id === selectedCategory ? updatedCategory : c
-                    ) || [];
-                    dispatch({ type: ACTIONS.SET_CATEGORIES, payload: updatedCategories });
+                    );
+                    
+                    // Dispatch both updates to ensure state is updated
+                    dispatch({ 
+                        type: ACTIONS.SET_CATEGORIES, 
+                        payload: updatedCategories 
+                    });
+                    
                     dispatch({ type: ACTIONS.SET_LOADING, payload: false });
                 } catch (error) {
-                    dispatch({ type: ACTIONS.SET_ERROR, payload: error.message });
+                    console.error('Error loading branches:', error);
+                    dispatch({ type: ACTIONS.SET_ERROR, payload: error.message || 'Failed to load branches' });
+                    dispatch({ type: ACTIONS.SET_LOADING, payload: false });
                 }
             }
         };
         loadBranches();
-    }, [selectedCategory, selectedFaculty, faculty, category, dispatch]);
+    }, [selectedFaculty, faculty, dispatch, category, selectedCategory, categories]);
 
     const handleBranchSelect = (branchId) => {
         dispatch({ type: ACTIONS.SELECT_BRANCH, payload: branchId });
@@ -47,6 +70,15 @@ const MCQ_Branch = () => {
     const handleBack = () => {
         dispatch({ type: ACTIONS.SELECT_FACULTY, payload: null });
     };
+
+    if (isLoading) {
+        return (
+            <div className="mcq-branch-loading">
+                <div className="mcq-loading-spinner"></div>
+                <p>Loading branches...</p>
+            </div>
+        );
+    }
 
     if (!faculty) {
         return (
@@ -64,9 +96,13 @@ const MCQ_Branch = () => {
 
     if (branches.length === 0) {
         return (
-            <div className="mcq-branch-loading">
-                <div className="mcq-loading-spinner"></div>
-                <p>Loading branches...</p>
+            <div className="mcq-branch-empty">
+                <i className="bi bi-folder-fill"></i>
+                <h3>No branches available</h3>
+                <p>This faculty doesn't have any branches yet.</p>
+                <button onClick={handleBack} className="mcq-back-btn">
+                    <i className="bi bi-arrow-left"></i> Go Back
+                </button>
             </div>
         );
     }

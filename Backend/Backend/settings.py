@@ -16,19 +16,27 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
-
+# ============================================
 # SECURITY WARNING: keep the secret key used in production secret!
+# ============================================
 SECRET_KEY = 'django-insecure-r016(8dp@!9l2+_yeicqqca6jjdhtv5e3r2nm)boc^k7(5qd#z'
 
+# ============================================
 # SECURITY WARNING: don't run with debug turned on in production!
+# ============================================
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+    'codenepal.com.np',
+    'www.codenepal.com.np',
+]
 
 
+# ============================================
 # Application definition
+# ============================================
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -38,17 +46,19 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     
-    # Manually Installed app
+    # Third-party apps
     'rest_framework',
     'corsheaders',
     
+    # Local apps
     "api",
+    "MCQ",
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'corsheaders.middleware.CorsMiddleware',  # Must be as high as possible
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'corsheaders.middleware.CorsMiddleware',  # corsheaders Middleware
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -76,8 +86,9 @@ TEMPLATES = [
 WSGI_APPLICATION = 'Backend.wsgi.application'
 
 
+# ============================================
 # Database
-# https://docs.djangoproject.com/en/6.0/ref/settings/#databases
+# ============================================
 
 DATABASES = {
     'default': {
@@ -87,8 +98,9 @@ DATABASES = {
 }
 
 
+# ============================================
 # Password validation
-# https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
+# ============================================
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -106,8 +118,9 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
+# ============================================
 # Internationalization
-# https://docs.djangoproject.com/en/6.0/topics/i18n/
+# ============================================
 
 LANGUAGE_CODE = 'en-us'
 
@@ -118,7 +131,156 @@ USE_I18N = True
 USE_TZ = True
 
 
+# ============================================
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/6.0/howto/static-files/
+# ============================================
 
 STATIC_URL = 'static/'
+
+
+# ============================================
+# CORS Configuration
+# ============================================
+
+# Allow all origins in development
+CORS_ALLOW_ALL_ORIGINS = True
+
+# Specific allowed origins (when CORS_ALLOW_ALL_ORIGINS is False)
+CORS_ALLOWED_ORIGINS = [
+    # Development
+    "http://localhost:3000",
+    "http://localhost:5173",
+    "http://localhost:5174",
+    "http://localhost:5175",
+    "http://127.0.0.1:3000",
+    "http://127.0.0.1:5173",
+    "http://127.0.0.1:5174",
+    "http://127.0.0.1:5175",
+    
+    # Production
+    "https://codenepal.com.np",
+    "https://www.codenepal.com.np",
+]
+
+# Allow credentials (cookies, authorization headers)
+CORS_ALLOW_CREDENTIALS = True
+
+# Allowed HTTP methods
+CORS_ALLOW_METHODS = [
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+]
+
+# Allowed headers
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
+
+# Preflight max age (in seconds)
+CORS_PREFLIGHT_MAX_AGE = 86400  # 24 hours
+
+
+# ============================================
+# Django REST Framework Configuration
+# ============================================
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.AllowAny',
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+    ],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 20,
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',
+        'rest_framework.renderers.BrowsableAPIRenderer',
+    ],
+    'DEFAULT_PARSER_CLASSES': [
+        'rest_framework.parsers.JSONParser',
+        'rest_framework.parsers.FormParser',
+        'rest_framework.parsers.MultiPartParser',
+    ],
+    # Use OpenAPI schema (DRF 3.14+)
+    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.openapi.AutoSchema',
+}
+
+
+# ============================================
+# Logging Configuration
+# ============================================
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'WARNING',
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'corsheaders': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+    },
+}
+
+
+# ============================================
+# Additional Security Settings (Production)
+# ============================================
+
+if not DEBUG:
+    # HTTPS settings
+    SECURE_SSL_REDIRECT = True
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    
+    # Security headers
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    SECURE_HSTS_SECONDS = 31536000  # 1 year
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    
+    # Session cookies
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    
+    # Clickjacking protection
+    X_FRAME_OPTIONS = 'DENY'

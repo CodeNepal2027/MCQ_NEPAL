@@ -21,7 +21,7 @@ const getInitialState = () => {
                     selectedAnswers: parsed.selectedAnswers || {},
                     quizCompleted: parsed.quizCompleted || false,
                     score: parsed.score || 0,
-                    isLoading: true, // Set loading to true while we restore state
+                    isLoading: true,
                     error: null,
                     isSubmitting: false
                 };
@@ -74,7 +74,9 @@ export const ACTIONS = {
     SET_LOADING: 'SET_LOADING',
     SET_ERROR: 'SET_ERROR',
     CLEAR_ERROR: 'CLEAR_ERROR',
-    SET_SUBMITTING: 'SET_SUBMITTING'
+    SET_SUBMITTING: 'SET_SUBMITTING',
+    UPDATE_FACULTY: 'UPDATE_FACULTY',
+    UPDATE_BRANCH: 'UPDATE_BRANCH',
 };
 
 // ============================================
@@ -108,7 +110,8 @@ const mcqReducer = (state, action) => {
     
     switch (action.type) {
         case ACTIONS.SET_CATEGORIES:
-            newState = { ...state, categories: action.payload, isLoading: false };
+            const categories = Array.isArray(action.payload) ? action.payload : [];
+            newState = { ...state, categories, isLoading: false };
             break;
 
         case ACTIONS.SELECT_CATEGORY:
@@ -178,10 +181,11 @@ const mcqReducer = (state, action) => {
             break;
 
         case ACTIONS.SET_QUESTIONS:
+            const questions = Array.isArray(action.payload) ? action.payload : [];
             newState = {
                 ...state,
-                questions: action.payload,
-                totalQuestions: action.payload.length,
+                questions: questions,
+                totalQuestions: questions.length,
                 currentQuestionIndex: 0,
                 selectedAnswers: {},
                 quizCompleted: false,
@@ -235,16 +239,17 @@ const mcqReducer = (state, action) => {
         }
 
         case ACTIONS.RESET_QUIZ:
+            // Keep questions but reset all quiz-related state
             newState = {
                 ...state,
-                questions: [],
                 currentQuestionIndex: 0,
                 selectedAnswers: {},
                 quizCompleted: false,
                 score: 0,
-                totalQuestions: 0,
+                isSubmitting: false,
                 error: null,
                 isLoading: false
+                // Keep: questions, selectedChapter, selectedBranch, selectedFaculty, selectedCategory
             };
             break;
 
@@ -264,11 +269,58 @@ const mcqReducer = (state, action) => {
             newState = { ...state, isSubmitting: action.payload };
             break;
 
+        case ACTIONS.UPDATE_FACULTY:
+            const { facultyId, facultyData } = action.payload;
+            const updatedCategories = state.categories.map(category => {
+                if (category.id === state.selectedCategory) {
+                    return {
+                        ...category,
+                        faculties: category.faculties?.map(f => 
+                            f.id === facultyId ? facultyData : f
+                        ) || []
+                    };
+                }
+                return category;
+            });
+            newState = { 
+                ...state, 
+                categories: updatedCategories, 
+                isLoading: false 
+            };
+            break;
+
+        case ACTIONS.UPDATE_BRANCH:
+            const { branchId, branchData } = action.payload;
+            const updatedCats = state.categories.map(category => {
+                if (category.id === state.selectedCategory) {
+                    return {
+                        ...category,
+                        faculties: category.faculties?.map(faculty => {
+                            if (faculty.id === state.selectedFaculty) {
+                                return {
+                                    ...faculty,
+                                    branches: faculty.branches?.map(b => 
+                                        b.id === branchId ? branchData : b
+                                    ) || []
+                                };
+                            }
+                            return faculty;
+                        }) || []
+                    };
+                }
+                return category;
+            });
+            newState = { 
+                ...state, 
+                categories: updatedCats, 
+                isLoading: false 
+            };
+            break;
+
         default:
             newState = state;
     }
     
-    // Save to localStorage whenever state changes (except loading and error states)
     if (action.type !== ACTIONS.SET_LOADING && 
         action.type !== ACTIONS.SET_ERROR && 
         action.type !== ACTIONS.CLEAR_ERROR) {
@@ -289,77 +341,89 @@ const MCQ_API_Context = createContext();
 export const MCQProvider = ({ children }) => {
     const [state, dispatch] = useReducer(mcqReducer, initialState);
 
-    // Load categories on mount if we have a selected category
+    // Load categories on mount
     useEffect(() => {
-        const loadSavedCategories = async () => {
-            if (state.categories.length === 0 && state.selectedCategory) {
-                try {
-                    // Set loading state
-                    dispatch({ type: ACTIONS.SET_LOADING, payload: true });
-                    
-                    // Import and fetch categories
-                    const { fetchCategories } = await import('./MCQ_API_Fetch');
-                    const data = await fetchCategories();
-                    
-                    // Set categories and clear loading
-                    dispatch({ type: ACTIONS.SET_CATEGORIES, payload: data });
-                } catch (error) {
-                    console.error('Failed to load categories:', error);
-                    // Set error but don't lose the selected state
-                    dispatch({ type: ACTIONS.SET_ERROR, payload: 'Failed to load categories. Please try again.' });
+        const loadCategories = async () => {
+            try {
+                if (state.categories && state.categories.length > 0) {
+                    dispatch({ type: ACTIONS.SET_LOADING, payload: false });
+                    return;
                 }
-            } else if (state.categories.length > 0) {
-                // If categories are already loaded, ensure loading is false
-                dispatch({ type: ACTIONS.SET_LOADING, payload: false });
+                
+                dispatch({ type: ACTIONS.SET_LOADING, payload: true });
+                
+                const { fetchCategories } = await import('./MCQ_API_Fetch');
+                const data = await fetchCategories();
+                
+                console.log('📦 Categories loaded in context:', data?.length || 0);
+                
+                const categories = Array.isArray(data) ? data : [];
+                dispatch({ type: ACTIONS.SET_CATEGORIES, payload: categories });
+            } catch (error) {
+                console.error('Failed to load categories:', error);
+                dispatch({ 
+                    type: ACTIONS.SET_ERROR, 
+                    payload: 'Failed to load categories. Please try again.' 
+                });
             }
         };
-        loadSavedCategories();
+        
+        loadCategories();
     }, []);
 
-    // Computed Values
+    // Computed Values with safety checks
     const getCurrentQuestion = () => {
-        if (state.questions.length === 0) return null;
-        return state.questions[state.currentQuestionIndex];
+        if (!state.questions || state.questions.length === 0) return null;
+        return state.questions[state.currentQuestionIndex] || null;
     };
 
     const getAnsweredCount = () => {
+        if (!state.selectedAnswers) return 0;
         return Object.keys(state.selectedAnswers).length;
     };
 
     const getProgress = () => {
-        if (state.totalQuestions === 0) return 0;
+        if (!state.totalQuestions || state.totalQuestions === 0) return 0;
         return ((state.currentQuestionIndex + 1) / state.totalQuestions) * 100;
     };
 
     const getScorePercentage = () => {
-        if (state.totalQuestions === 0) return 0;
+        if (!state.totalQuestions || state.totalQuestions === 0) return 0;
         return Math.round((state.score / state.totalQuestions) * 100);
     };
 
     const getCategory = () => {
+        if (!state.categories || !Array.isArray(state.categories) || !state.selectedCategory) {
+            return null;
+        }
         return state.categories.find(c => c.id === state.selectedCategory) || null;
     };
 
     const getFaculty = () => {
         const category = getCategory();
-        if (!category) return null;
-        return category.faculties?.find(f => f.id === state.selectedFaculty) || null;
+        if (!category || !category.faculties || !Array.isArray(category.faculties)) {
+            return null;
+        }
+        return category.faculties.find(f => f.id === state.selectedFaculty) || null;
     };
 
     const getBranch = () => {
         const faculty = getFaculty();
-        if (!faculty) return null;
-        return faculty.branches?.find(b => b.id === state.selectedBranch) || null;
+        if (!faculty || !faculty.branches || !Array.isArray(faculty.branches)) {
+            return null;
+        }
+        return faculty.branches.find(b => b.id === state.selectedBranch) || null;
     };
 
     const getChapter = () => {
         const branch = getBranch();
-        if (!branch) return null;
-        return branch.chapters?.find(c => c.id === state.selectedChapter) || null;
+        if (!branch || !branch.chapters || !Array.isArray(branch.chapters)) {
+            return null;
+        }
+        return branch.chapters.find(c => c.id === state.selectedChapter) || null;
     };
 
     const value = {
-        // State
         ...state,
         
         // Computed Values
@@ -377,12 +441,18 @@ export const MCQProvider = ({ children }) => {
         ACTIONS,
         
         // Action Creators
-        setCategories: (categories) => dispatch({ type: ACTIONS.SET_CATEGORIES, payload: categories }),
+        setCategories: (categories) => {
+            const safeCategories = Array.isArray(categories) ? categories : [];
+            dispatch({ type: ACTIONS.SET_CATEGORIES, payload: safeCategories });
+        },
         selectCategory: (categoryId) => dispatch({ type: ACTIONS.SELECT_CATEGORY, payload: categoryId }),
         selectFaculty: (facultyId) => dispatch({ type: ACTIONS.SELECT_FACULTY, payload: facultyId }),
         selectBranch: (branchId) => dispatch({ type: ACTIONS.SELECT_BRANCH, payload: branchId }),
         selectChapter: (chapterId) => dispatch({ type: ACTIONS.SELECT_CHAPTER, payload: chapterId }),
-        setQuestions: (questions) => dispatch({ type: ACTIONS.SET_QUESTIONS, payload: questions }),
+        setQuestions: (questions) => {
+            const safeQuestions = Array.isArray(questions) ? questions : [];
+            dispatch({ type: ACTIONS.SET_QUESTIONS, payload: safeQuestions });
+        },
         nextQuestion: () => dispatch({ type: ACTIONS.NEXT_QUESTION }),
         prevQuestion: () => dispatch({ type: ACTIONS.PREV_QUESTION }),
         jumpToQuestion: (index) => dispatch({ type: ACTIONS.JUMP_TO_QUESTION, payload: index }),
