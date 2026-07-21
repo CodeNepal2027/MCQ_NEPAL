@@ -148,7 +148,7 @@ const MCQ_Question = () => {
                             <div className="mcq-options">
                                 {question.options.map((option, optIndex) => {
                                     const isSelected = selectedAnswer === optIndex;
-                                    const isCorrect = optIndex === question.correctAnswer;
+                                    const isCorrect = optIndex === question.correct_answer;
                                     const showResult = showAnswer;
 
                                     let className = 'mcq-option';
@@ -210,8 +210,8 @@ const MCQ_Question = () => {
                             {showAnswer && showExplanation && (
                                 <div className="mcq-explanation">
                                     <div className="mcq-explanation-header">
-                                        <span className={`mcq-explanation-badge ${selectedAnswer === question.correctAnswer ? 'correct' : 'incorrect'}`}>
-                                            {selectedAnswer !== null && selectedAnswer === question.correctAnswer ? (
+                                        <span className={`mcq-explanation-badge ${selectedAnswer === question.correct_answer ? 'correct' : 'incorrect'}`}>
+                                            {selectedAnswer !== null && selectedAnswer === question.correct_answer ? (
                                                 <>
                                                     <i className="bi bi-check-circle-fill"></i> Your Answer: Correct!
                                                 </>
@@ -230,7 +230,7 @@ const MCQ_Question = () => {
                                         <div className="explanation-row">
                                             <span className="explanation-label">Correct Answer:</span>
                                             <span className="explanation-value correct-text">
-                                                {optionLabels[question.correctAnswer]}. {question.options[question.correctAnswer]}
+                                                {optionLabels[question.correct_answer]}. {question.options[question.correct_answer]}
                                             </span>
                                         </div>
                                         <div className="explanation-divider"></div>

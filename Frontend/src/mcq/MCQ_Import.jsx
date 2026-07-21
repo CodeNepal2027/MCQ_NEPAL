@@ -22,7 +22,9 @@ import {
     fetchBranches,
     fetchChapters,
     fetchQuestions,
-    clearCache
+    clearCache,
+    getCacheStats,
+    cache,
 } from "./MCQ_API_Fetch"
 
 export {
@@ -44,7 +46,9 @@ export {
     fetchBranches,
     fetchChapters,
     fetchQuestions,
-    clearCache
+    clearCache,
+    getCacheStats,
+    cache,
 }
 
 export default {
@@ -64,5 +68,7 @@ export default {
     fetchBranches,
     fetchChapters,
     fetchQuestions,
-    clearCache
+    clearCache,
+    getCacheStats,
+    cache,
 }
