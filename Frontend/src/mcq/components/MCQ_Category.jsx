@@ -72,37 +72,42 @@ const MCQ_Category = () => {
 
             {/* Category Grid */}
             <div className="mcq-category-grid">
-                {categories.map((category) => (
-                    <div
-                        key={category.id}
-                        className="mcq-category-card"
-                        onClick={() => handleCategorySelect(category.id)}
-                    >
-                        <div className="card-badge">
-                            <i className="bi bi-pin-fill"></i>
+                {categories.map((category) => {
+                    // Get faculty count safely
+                    const facultyCount = category.faculties?.length || 0;
+                    
+                    return (
+                        <div
+                            key={category.id}
+                            className="mcq-category-card"
+                            onClick={() => handleCategorySelect(category.id)}
+                        >
+                            <div className="card-badge">
+                                <i className="bi bi-pin-fill"></i>
+                            </div>
+                            <div className="mcq-category-icon">
+                                <i className={category.icon}></i>
+                            </div>
+                            <h3 className="mcq-category-name">{category.name}</h3>
+                            <p className="mcq-category-desc">{category.description}</p>
+                            <div className="mcq-category-meta">
+                                <span className="meta-item">
+                                    <i className="bi bi-folder-fill"></i>
+                                    {facultyCount} Faculties
+                                </span>
+                                <span className="meta-item">
+                                    <i className="bi bi-clock-history"></i>
+                                    New
+                                </span>
+                            </div>
+                            <div className="mcq-category-arrow">
+                                <span>Start Practice</span>
+                                <i className="bi bi-arrow-right-circle-fill"></i>
+                            </div>
+                            <div className="card-glow"></div>
                         </div>
-                        <div className="mcq-category-icon">
-                            <i className={category.icon}></i>
-                        </div>
-                        <h3 className="mcq-category-name">{category.name}</h3>
-                        <p className="mcq-category-desc">{category.description}</p>
-                        <div className="mcq-category-meta">
-                            <span className="meta-item">
-                                <i className="bi bi-folder-fill"></i>
-                                {category.subCategories?.length || 0} Sub-categories
-                            </span>
-                            <span className="meta-item">
-                                <i className="bi bi-clock-history"></i>
-                                New
-                            </span>
-                        </div>
-                        <div className="mcq-category-arrow">
-                            <span>Start Practice</span>
-                            <i className="bi bi-arrow-right-circle-fill"></i>
-                        </div>
-                        <div className="card-glow"></div>
-                    </div>
-                ))}
+                    );
+                })}
             </div>
 
             {/* Footer Note */}

@@ -358,3 +358,165 @@
     font-size: 16px;
     color: var(--text-color-3);
 }
+
+
+
+
+
+
+/* ============================================
+   SHIMMER SKELETON LOADER
+   ============================================ */
+
+/* Shimmer Animation - Key part for the shimmer effect */
+@keyframes shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+.shimmer {
+    background: linear-gradient(
+        90deg,
+        #e5e7eb 25%,
+        #f3f4f6 50%,
+        #e5e7eb 75%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s ease-in-out infinite;
+    border-radius: 4px;
+}
+
+/* Dark mode support for shimmer */
+@media (prefers-color-scheme: dark) {
+    .shimmer {
+        background: linear-gradient(
+            90deg,
+            #374151 25%,
+            #4b5563 50%,
+            #374151 75%
+        );
+        background-size: 200% 100%;
+        animation: shimmer 1.5s ease-in-out infinite;
+    }
+}
+
+/* Back Button Skeleton */
+.mcq-back-btn-skeleton {
+    width: 120px;
+    height: 32px;
+    border-radius: 8px;
+}
+
+/* Header Icon Skeleton */
+.header-icon-skeleton {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+/* Title Skeleton */
+.mcq-branch-title-skeleton {
+    width: 200px;
+    height: 32px;
+    border-radius: 4px;
+    margin-bottom: 6px;
+}
+
+/* Subtitle Skeleton */
+.mcq-branch-subtitle-skeleton {
+    width: 250px;
+    height: 20px;
+    border-radius: 4px;
+}
+
+/* Card Skeletons */
+.mcq-branch-card.skeleton {
+    cursor: default;
+    padding: 28px 20px 24px;
+    border: 1px solid var(--border-color, #e5e7eb);
+    background: var(--bg-main-1, #ffffff);
+    border-radius: var(--radius-lg, 12px);
+}
+
+.mcq-branch-card.skeleton:hover {
+    transform: none !important;
+    box-shadow: none !important;
+    border-color: var(--border-color, #e5e7eb) !important;
+}
+
+.mcq-branch-card.skeleton .skeleton-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    margin: 0 auto 14px;
+}
+
+.mcq-branch-card.skeleton .skeleton-icon.shimmer {
+    background: linear-gradient(
+        90deg,
+        #e5e7eb 25%,
+        #f3f4f6 50%,
+        #e5e7eb 75%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s ease-in-out infinite;
+}
+
+.mcq-branch-card.skeleton .skeleton-title {
+    height: 20px;
+    width: 60%;
+    border-radius: 4px;
+    margin: 0 auto 8px;
+}
+
+.mcq-branch-card.skeleton .skeleton-title.shimmer {
+    background: linear-gradient(
+        90deg,
+        #e5e7eb 25%,
+        #f3f4f6 50%,
+        #e5e7eb 75%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s ease-in-out infinite 0.1s;
+}
+
+.mcq-branch-card.skeleton .skeleton-desc {
+    height: 14px;
+    width: 70%;
+    border-radius: 4px;
+    margin: 0 auto 12px;
+}
+
+.mcq-branch-card.skeleton .skeleton-desc.shimmer {
+    background: linear-gradient(
+        90deg,
+        #e5e7eb 25%,
+        #f3f4f6 50%,
+        #e5e7eb 75%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s ease-in-out infinite 0.2s;
+}
+
+.mcq-branch-card.skeleton .skeleton-meta {
+    height: 24px;
+    width: 40%;
+    border-radius: 50px;
+    margin: 0 auto;
+}
+
+.mcq-branch-card.skeleton .skeleton-meta.shimmer {
+    background: linear-gradient(
+        90deg,
+        #e5e7eb 25%,
+        #f3f4f6 50%,
+        #e5e7eb 75%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s ease-in-out infinite 0.3s;
+}

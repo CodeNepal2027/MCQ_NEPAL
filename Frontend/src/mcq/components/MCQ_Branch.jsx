@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useMCQ, ACTIONS } from '../MCQ_API_Context';
 import { fetchBranchesByFaculty } from '../MCQ_API_Fetch';
 import '../assets/css/MCQ_Branch.css';
@@ -14,28 +14,26 @@ const MCQ_Branch = () => {
         categories
     } = useMCQ();
 
+    // Use a ref to track if branches are already loaded
+    const branchesLoadedRef = useRef(false);
+
     // Load branches if not already loaded
     useEffect(() => {
         const loadBranches = async () => {
-            if (selectedFaculty && !faculty?.branches) {
+            if (selectedFaculty && !faculty?.branches && !branchesLoadedRef.current) {
                 dispatch({ type: ACTIONS.SET_LOADING, payload: true });
                 try {
                     console.log('📡 Loading branches for faculty:', selectedFaculty);
                     const branches = await fetchBranchesByFaculty(selectedFaculty);
                     console.log('📦 Branches loaded:', branches);
                     
-                    // Update the faculty with branches
                     const updatedFaculty = { ...faculty, branches };
                     
-                    // Update the faculty in the categories state
-                    // Method 1: Using UPDATE_FACULTY action
                     dispatch({ 
                         type: ACTIONS.UPDATE_FACULTY, 
                         payload: { facultyId: selectedFaculty, facultyData: updatedFaculty } 
                     });
                     
-                    // Method 2: Direct update (fallback)
-                    // Also update categories directly to be safe
                     const updatedCategory = { ...category };
                     const updatedFaculties = updatedCategory.faculties?.map(f => 
                         f.id === selectedFaculty ? updatedFaculty : f
@@ -46,12 +44,12 @@ const MCQ_Branch = () => {
                         c.id === selectedCategory ? updatedCategory : c
                     );
                     
-                    // Dispatch both updates to ensure state is updated
                     dispatch({ 
                         type: ACTIONS.SET_CATEGORIES, 
                         payload: updatedCategories 
                     });
                     
+                    branchesLoadedRef.current = true;
                     dispatch({ type: ACTIONS.SET_LOADING, payload: false });
                 } catch (error) {
                     console.error('Error loading branches:', error);
@@ -61,7 +59,12 @@ const MCQ_Branch = () => {
             }
         };
         loadBranches();
-    }, [selectedFaculty, faculty, dispatch, category, selectedCategory, categories]);
+    }, [selectedFaculty, faculty?.branches, dispatch, category, selectedCategory, categories]);
+
+    // Reset the loaded ref when faculty changes
+    useEffect(() => {
+        branchesLoadedRef.current = false;
+    }, [selectedFaculty]);
 
     const handleBranchSelect = (branchId) => {
         dispatch({ type: ACTIONS.SELECT_BRANCH, payload: branchId });
@@ -71,11 +74,30 @@ const MCQ_Branch = () => {
         dispatch({ type: ACTIONS.SELECT_FACULTY, payload: null });
     };
 
+    // Show skeleton loader
     if (isLoading) {
         return (
-            <div className="mcq-branch-loading">
-                <div className="mcq-loading-spinner"></div>
-                <p>Loading branches...</p>
+            <div className="mcq-branch-container">
+                <div className="mcq-branch-header">
+                    <div className="mcq-back-btn-skeleton shimmer"></div>
+                    <div className="header-content">
+                        <div className="header-icon-skeleton shimmer"></div>
+                        <div>
+                            <div className="mcq-branch-title-skeleton shimmer"></div>
+                            <div className="mcq-branch-subtitle-skeleton shimmer"></div>
+                        </div>
+                    </div>
+                </div>
+                <div className="mcq-branch-grid">
+                    {[1, 2, 3, 4, 5, 6].map((i) => (
+                        <div key={i} className="mcq-branch-card skeleton">
+                            <div className="skeleton-icon shimmer"></div>
+                            <div className="skeleton-title shimmer"></div>
+                            <div className="skeleton-desc shimmer"></div>
+                            <div className="skeleton-meta shimmer"></div>
+                        </div>
+                    ))}
+                </div>
             </div>
         );
     }
