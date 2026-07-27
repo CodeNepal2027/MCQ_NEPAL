@@ -2,19 +2,6 @@
 // MCQ API SERVICE - Optimized with Smart Caching
 // ============================================
 
-import {
-    API_ENDPOINTS,
-    apiGet,
-    apiPost,
-    apiPut,
-    apiPatch,
-    apiDelete,
-    USE_MOCK_DATA,
-    API_CONFIG
-} from '../config/api';
-
-import { mockCategories, mockQuestions } from './MCQ_mockData';
-
 // ============================================
 // SMART CACHE MANAGEMENT
 // ============================================
@@ -25,6 +12,7 @@ class SmartCache {
         this.duration = duration;
         this.pendingRequests = new Map();
         this.stats = { hits: 0, misses: 0 };
+        this.version = localStorage.getItem('mcq_cache_version') || '1.0';
     }
 
     get(key) {
@@ -44,29 +32,63 @@ class SmartCache {
     clear() {
         this.cache.clear();
         this.stats = { hits: 0, misses: 0 };
+        localStorage.removeItem('mcq_cache_version');
     }
 
     clearByPrefix(prefix) {
+        const keysToDelete = [];
         for (const key of this.cache.keys()) {
             if (key.startsWith(prefix)) {
-                this.cache.delete(key);
+                keysToDelete.push(key);
             }
         }
+        keysToDelete.forEach(key => this.cache.delete(key));
+    }
+
+    clearByCategory(categoryId) {
+        this.clearByPrefix(`categories`);
+        this.clearByPrefix(`category_${categoryId}`);
+        this.clearByPrefix(`faculties_category_${categoryId}`);
+        this.clearByPrefix(`branches_category_${categoryId}`);
+        this.clearByPrefix(`chapters_category_${categoryId}`);
+    }
+
+    clearByFaculty(facultyId) {
+        this.clearByPrefix(`faculties`);
+        this.clearByPrefix(`faculty_${facultyId}`);
+        this.clearByPrefix(`branches_faculty_${facultyId}`);
+    }
+
+    clearByBranch(branchId) {
+        this.clearByPrefix(`branches`);
+        this.clearByPrefix(`branch_${branchId}`);
+        this.clearByPrefix(`chapters_branch_${branchId}`);
+    }
+
+    clearByChapter(chapterId) {
+        this.clearByPrefix(`chapters`);
+        this.clearByPrefix(`chapter_${chapterId}`);
+        this.clearByPrefix(`questions_chapter_${chapterId}`);
     }
 
     getStats() {
         const total = this.stats.hits + this.stats.misses;
         return {
-            ...this.stats,
+            hits: this.stats.hits,
+            misses: this.stats.misses,
             total,
             hitRate: total > 0 ? Math.round((this.stats.hits / total) * 100) : 0,
             size: this.cache.size,
+            version: this.version,
+            keys: Array.from(this.cache.keys()).slice(0, 10) // Show first 10 keys
         };
     }
 
-    async getOrFetch(key, fetchFn) {
-        const cached = this.get(key);
-        if (cached) return cached;
+    async getOrFetch(key, fetchFn, forceRefresh = false) {
+        if (!forceRefresh) {
+            const cached = this.get(key);
+            if (cached) return cached;
+        }
 
         if (this.pendingRequests.has(key)) {
             return this.pendingRequests.get(key);
@@ -83,6 +105,20 @@ class SmartCache {
 
         this.pendingRequests.set(key, promise);
         return promise;
+    }
+
+    invalidate(version) {
+        this.version = version;
+        localStorage.setItem('mcq_cache_version', version);
+        this.clear();
+    }
+
+    checkVersion(serverVersion) {
+        if (serverVersion && serverVersion !== this.version) {
+            this.invalidate(serverVersion);
+            return true;
+        }
+        return false;
     }
 }
 
@@ -124,10 +160,132 @@ const processApiResponse = (response) => {
 };
 
 // ============================================
+// API BASE URL & CONFIG
+// ============================================
+
+// Check if we should use mock data
+const USE_MOCK_DATA = import.meta.env?.VITE_USE_MOCK_DATA === 'true' || false;
+
+// Import mock data (if available)
+let mockCategories = [];
+let mockQuestions = {};
+
+try {
+    const mockData = await import('./MCQ_mockData');
+    mockCategories = mockData.mockCategories || [];
+    mockQuestions = mockData.mockQuestions || {};
+} catch (e) {
+    console.log('No mock data found, using real API');
+}
+
+const API_CONFIG = {
+    BASE_URL: import.meta.env?.VITE_API_URL || 'http://127.0.0.1:8000/api/v1'
+};
+
+// API Endpoints
+const API_ENDPOINTS = {
+    CATEGORIES: `${API_CONFIG.BASE_URL}/categories/`,
+    FACULTIES: `${API_CONFIG.BASE_URL}/faculties/`,
+    BRANCHES: `${API_CONFIG.BASE_URL}/branches/`,
+    CHAPTERS: `${API_CONFIG.BASE_URL}/chapters/`,
+    QUESTIONS: `${API_CONFIG.BASE_URL}/questions/`
+};
+
+// ============================================
+// GENERIC API FUNCTIONS
+// ============================================
+
+const apiGet = async (url, params = {}) => {
+    const queryString = new URLSearchParams(params).toString();
+    const fullUrl = queryString ? `${url}?${queryString}` : url;
+    
+    const response = await fetch(fullUrl, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+        },
+    });
+    
+    if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    return response.json();
+};
+
+const apiPost = async (url, data) => {
+    const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+        },
+        body: JSON.stringify(data),
+    });
+    
+    if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    return response.json();
+};
+
+const apiPut = async (url, data) => {
+    const response = await fetch(url, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+        },
+        body: JSON.stringify(data),
+    });
+    
+    if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    return response.json();
+};
+
+const apiPatch = async (url, data) => {
+    const response = await fetch(url, {
+        method: 'PATCH',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+        },
+        body: JSON.stringify(data),
+    });
+    
+    if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    return response.json();
+};
+
+const apiDelete = async (url) => {
+    const response = await fetch(url, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+        },
+    });
+    
+    if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    return response.json();
+};
+
+// ============================================
 // CATEGORY API FUNCTIONS
 // ============================================
 
-export const fetchCategories = async () => {
+export const fetchCategories = async (forceRefresh = false) => {
     if (USE_MOCK_DATA) {
         await new Promise(resolve => setTimeout(resolve, 300));
         return mockCategories;
@@ -143,25 +301,29 @@ export const fetchCategories = async () => {
             console.error('Error fetching categories:', error);
             return [];
         }
-    });
+    }, forceRefresh);
 };
 
-export const fetchCategory = async (categoryId) => {
+export const fetchCategory = async (categoryId, forceRefresh = false) => {
     if (USE_MOCK_DATA) {
         await new Promise(resolve => setTimeout(resolve, 200));
         return mockCategories.find(c => c.id === categoryId) || null;
     }
 
-    try {
-        const response = await apiGet(`${API_CONFIG.BASE_URL}categories/${categoryId}/`);
-        return response.data || response;
-    } catch (error) {
-        console.error(`Error fetching category ${categoryId}:`, error);
-        return null;
-    }
+    const cacheKey = `category_${categoryId}`;
+    
+    return cache.getOrFetch(cacheKey, async () => {
+        try {
+            const response = await apiGet(`${API_CONFIG.BASE_URL}/categories/${categoryId}/`);
+            return response.data || response;
+        } catch (error) {
+            console.error(`Error fetching category ${categoryId}:`, error);
+            return null;
+        }
+    }, forceRefresh);
 };
 
-export const fetchCategoryWithAll = async (categoryId) => {
+export const fetchCategoryWithAll = async (categoryId, forceRefresh = false) => {
     if (USE_MOCK_DATA) {
         await new Promise(resolve => setTimeout(resolve, 300));
         const category = mockCategories.find(c => c.id === categoryId);
@@ -169,21 +331,19 @@ export const fetchCategoryWithAll = async (categoryId) => {
     }
 
     const cacheKey = `category_full_${categoryId}`;
-    const cached = cache.get(cacheKey);
-    if (cached) return cached;
-
-    try {
-        const response = await apiGet(`${API_CONFIG.BASE_URL}categories/${categoryId}/full/`);
-        const data = response.data || response;
-        cache.set(cacheKey, data);
-        return data;
-    } catch (error) {
-        console.error(`Error fetching full category ${categoryId}:`, error);
-        return null;
-    }
+    
+    return cache.getOrFetch(cacheKey, async () => {
+        try {
+            const response = await apiGet(`${API_CONFIG.BASE_URL}/categories/${categoryId}/full/`);
+            return response.data || response;
+        } catch (error) {
+            console.error(`Error fetching full category ${categoryId}:`, error);
+            return null;
+        }
+    }, forceRefresh);
 };
 
-export const fetchFacultiesByCategory = async (categoryId) => {
+export const fetchFacultiesByCategory = async (categoryId, forceRefresh = false) => {
     if (USE_MOCK_DATA) {
         await new Promise(resolve => setTimeout(resolve, 200));
         const category = mockCategories.find(c => c.id === categoryId);
@@ -191,21 +351,21 @@ export const fetchFacultiesByCategory = async (categoryId) => {
     }
 
     const cacheKey = `faculties_category_${categoryId}`;
-    const cached = cache.get(cacheKey);
-    if (cached) return cached;
-
-    try {
-        const response = await apiGet(`${API_CONFIG.BASE_URL}categories/${categoryId}/faculties/`);
-        const faculties = processApiResponse(response);
-        cache.set(cacheKey, faculties);
-        return faculties;
-    } catch (error) {
-        console.error(`Error fetching faculties for category ${categoryId}:`, error);
-        return [];
-    }
+    
+    return cache.getOrFetch(cacheKey, async () => {
+        try {
+            const response = await apiGet(`${API_CONFIG.BASE_URL}/faculties/?category_id=${categoryId}`);
+            const faculties = processApiResponse(response);
+            console.log(`📦 Faculties loaded for category ${categoryId}:`, faculties.length);
+            return faculties;
+        } catch (error) {
+            console.error(`Error fetching faculties for category ${categoryId}:`, error);
+            return [];
+        }
+    }, forceRefresh);
 };
 
-export const fetchCategoriesWithFaculties = async () => {
+export const fetchCategoriesWithFaculties = async (forceRefresh = false) => {
     if (USE_MOCK_DATA) {
         await new Promise(resolve => setTimeout(resolve, 300));
         return mockCategories.map(c => ({
@@ -215,25 +375,23 @@ export const fetchCategoriesWithFaculties = async () => {
     }
 
     const cacheKey = 'categories_with_faculties';
-    const cached = cache.get(cacheKey);
-    if (cached) return cached;
-
-    try {
-        const response = await apiGet(`${API_CONFIG.BASE_URL}categories/with-faculties/`);
-        const data = processApiResponse(response);
-        cache.set(cacheKey, data);
-        return data;
-    } catch (error) {
-        console.error('Error fetching categories with faculties:', error);
-        return [];
-    }
+    
+    return cache.getOrFetch(cacheKey, async () => {
+        try {
+            const response = await apiGet(`${API_CONFIG.BASE_URL}/categories/with-faculties/`);
+            return processApiResponse(response);
+        } catch (error) {
+            console.error('Error fetching categories with faculties:', error);
+            return [];
+        }
+    }, forceRefresh);
 };
 
 // ============================================
 // FACULTY API FUNCTIONS
 // ============================================
 
-export const fetchFaculties = async (categoryId = null) => {
+export const fetchFaculties = async (categoryId = null, forceRefresh = false) => {
     if (USE_MOCK_DATA) {
         await new Promise(resolve => setTimeout(resolve, 200));
         if (categoryId) {
@@ -250,22 +408,20 @@ export const fetchFaculties = async (categoryId = null) => {
     }
 
     const cacheKey = categoryId ? `faculties_all_${categoryId}` : 'faculties_all';
-    const cached = cache.get(cacheKey);
-    if (cached) return cached;
-
-    try {
-        const params = categoryId ? { category_id: categoryId } : {};
-        const response = await apiGet(API_ENDPOINTS.FACULTIES, params);
-        const faculties = processApiResponse(response);
-        cache.set(cacheKey, faculties);
-        return faculties;
-    } catch (error) {
-        console.error('Error fetching faculties:', error);
-        return [];
-    }
+    
+    return cache.getOrFetch(cacheKey, async () => {
+        try {
+            const params = categoryId ? { category_id: categoryId } : {};
+            const response = await apiGet(API_ENDPOINTS.FACULTIES, params);
+            return processApiResponse(response);
+        } catch (error) {
+            console.error('Error fetching faculties:', error);
+            return [];
+        }
+    }, forceRefresh);
 };
 
-export const fetchFaculty = async (facultyId) => {
+export const fetchFaculty = async (facultyId, forceRefresh = false) => {
     if (USE_MOCK_DATA) {
         await new Promise(resolve => setTimeout(resolve, 200));
         for (const category of mockCategories) {
@@ -275,16 +431,20 @@ export const fetchFaculty = async (facultyId) => {
         return null;
     }
 
-    try {
-        const response = await apiGet(`${API_CONFIG.BASE_URL}faculties/${facultyId}/`);
-        return response.data || response;
-    } catch (error) {
-        console.error(`Error fetching faculty ${facultyId}:`, error);
-        return null;
-    }
+    const cacheKey = `faculty_${facultyId}`;
+    
+    return cache.getOrFetch(cacheKey, async () => {
+        try {
+            const response = await apiGet(`${API_CONFIG.BASE_URL}/faculties/${facultyId}/`);
+            return response.data || response;
+        } catch (error) {
+            console.error(`Error fetching faculty ${facultyId}:`, error);
+            return null;
+        }
+    }, forceRefresh);
 };
 
-export const fetchFacultyWithAll = async (facultyId) => {
+export const fetchFacultyWithAll = async (facultyId, forceRefresh = false) => {
     if (USE_MOCK_DATA) {
         await new Promise(resolve => setTimeout(resolve, 300));
         for (const category of mockCategories) {
@@ -295,21 +455,19 @@ export const fetchFacultyWithAll = async (facultyId) => {
     }
 
     const cacheKey = `faculty_full_${facultyId}`;
-    const cached = cache.get(cacheKey);
-    if (cached) return cached;
-
-    try {
-        const response = await apiGet(`${API_CONFIG.BASE_URL}faculties/${facultyId}/full/`);
-        const data = response.data || response;
-        cache.set(cacheKey, data);
-        return data;
-    } catch (error) {
-        console.error(`Error fetching full faculty ${facultyId}:`, error);
-        return null;
-    }
+    
+    return cache.getOrFetch(cacheKey, async () => {
+        try {
+            const response = await apiGet(`${API_CONFIG.BASE_URL}/faculties/${facultyId}/full/`);
+            return response.data || response;
+        } catch (error) {
+            console.error(`Error fetching full faculty ${facultyId}:`, error);
+            return null;
+        }
+    }, forceRefresh);
 };
 
-export const fetchBranchesByFaculty = async (facultyId) => {
+export const fetchBranchesByFaculty = async (facultyId, forceRefresh = false) => {
     if (USE_MOCK_DATA) {
         await new Promise(resolve => setTimeout(resolve, 200));
         for (const category of mockCategories) {
@@ -320,25 +478,25 @@ export const fetchBranchesByFaculty = async (facultyId) => {
     }
 
     const cacheKey = `branches_faculty_${facultyId}`;
-    const cached = cache.get(cacheKey);
-    if (cached) return cached;
-
-    try {
-        const response = await apiGet(`${API_CONFIG.BASE_URL}faculties/${facultyId}/branches/`);
-        const branches = processApiResponse(response);
-        cache.set(cacheKey, branches);
-        return branches;
-    } catch (error) {
-        console.error(`Error fetching branches for faculty ${facultyId}:`, error);
-        return [];
-    }
+    
+    return cache.getOrFetch(cacheKey, async () => {
+        try {
+            const response = await apiGet(`${API_CONFIG.BASE_URL}/faculties/${facultyId}/branches/`);
+            const branches = processApiResponse(response);
+            console.log(`📦 Branches loaded for faculty ${facultyId}:`, branches.length);
+            return branches;
+        } catch (error) {
+            console.error(`Error fetching branches for faculty ${facultyId}:`, error);
+            return [];
+        }
+    }, forceRefresh);
 };
 
 // ============================================
 // BRANCH API FUNCTIONS
 // ============================================
 
-export const fetchBranches = async (facultyId = null) => {
+export const fetchBranches = async (facultyId = null, forceRefresh = false) => {
     if (USE_MOCK_DATA) {
         await new Promise(resolve => setTimeout(resolve, 200));
         if (facultyId) {
@@ -363,22 +521,21 @@ export const fetchBranches = async (facultyId = null) => {
     }
 
     const cacheKey = facultyId ? `branches_all_${facultyId}` : 'branches_all';
-    const cached = cache.get(cacheKey);
-    if (cached) return cached;
-
-    try {
-        const params = facultyId ? { faculty_id: facultyId } : {};
-        const response = await apiGet(API_ENDPOINTS.BRANCHES, params);
-        const branches = processApiResponse(response);
-        cache.set(cacheKey, branches);
-        return branches;
-    } catch (error) {
-        console.error('Error fetching branches:', error);
-        return [];
-    }
+    
+    return cache.getOrFetch(cacheKey, async () => {
+        try {
+            const params = facultyId ? { faculty_id: facultyId } : {};
+            const response = await apiGet(API_ENDPOINTS.BRANCHES, params);
+            return processApiResponse(response);
+            
+        } catch (error) {
+            console.error('Error fetching branches:', error);
+            return [];
+        }
+    }, forceRefresh);
 };
 
-export const fetchBranch = async (branchId) => {
+export const fetchBranch = async (branchId, forceRefresh = false) => {
     if (USE_MOCK_DATA) {
         await new Promise(resolve => setTimeout(resolve, 200));
         for (const category of mockCategories) {
@@ -390,16 +547,20 @@ export const fetchBranch = async (branchId) => {
         return null;
     }
 
-    try {
-        const response = await apiGet(`${API_CONFIG.BASE_URL}branches/${branchId}/`);
-        return response.data || response;
-    } catch (error) {
-        console.error(`Error fetching branch ${branchId}:`, error);
-        return null;
-    }
+    const cacheKey = `branch_${branchId}`;
+    
+    return cache.getOrFetch(cacheKey, async () => {
+        try {
+            const response = await apiGet(`${API_CONFIG.BASE_URL}/branches/${branchId}/`);
+            return response.data || response;
+        } catch (error) {
+            console.error(`Error fetching branch ${branchId}:`, error);
+            return null;
+        }
+    }, forceRefresh);
 };
 
-export const fetchBranchWithAll = async (branchId) => {
+export const fetchBranchWithAll = async (branchId, forceRefresh = false) => {
     if (USE_MOCK_DATA) {
         await new Promise(resolve => setTimeout(resolve, 300));
         for (const category of mockCategories) {
@@ -412,21 +573,20 @@ export const fetchBranchWithAll = async (branchId) => {
     }
 
     const cacheKey = `branch_full_${branchId}`;
-    const cached = cache.get(cacheKey);
-    if (cached) return cached;
-
-    try {
-        const response = await apiGet(`${API_CONFIG.BASE_URL}branches/${branchId}/full/`);
-        const data = response.data || response;
-        cache.set(cacheKey, data);
-        return data;
-    } catch (error) {
-        console.error(`Error fetching full branch ${branchId}:`, error);
-        return null;
-    }
+    
+    return cache.getOrFetch(cacheKey, async () => {
+        try {
+            const response = await apiGet(`${API_CONFIG.BASE_URL}/branches/${branchId}/full/`);
+            return response.data || response;
+            
+        } catch (error) {
+            console.error(`Error fetching full branch ${branchId}:`, error);
+            return null;
+        }
+    }, forceRefresh);
 };
 
-export const fetchChaptersByBranch = async (branchId) => {
+export const fetchChaptersByBranch = async (branchId, forceRefresh = false) => {
     if (USE_MOCK_DATA) {
         await new Promise(resolve => setTimeout(resolve, 200));
         for (const category of mockCategories) {
@@ -439,25 +599,25 @@ export const fetchChaptersByBranch = async (branchId) => {
     }
 
     const cacheKey = `chapters_branch_${branchId}`;
-    const cached = cache.get(cacheKey);
-    if (cached) return cached;
-
-    try {
-        const response = await apiGet(`${API_CONFIG.BASE_URL}branches/${branchId}/chapters/`);
-        const chapters = processApiResponse(response);
-        cache.set(cacheKey, chapters);
-        return chapters;
-    } catch (error) {
-        console.error(`Error fetching chapters for branch ${branchId}:`, error);
-        return [];
-    }
+    
+    return cache.getOrFetch(cacheKey, async () => {
+        try {
+            const response = await apiGet(`${API_CONFIG.BASE_URL}/branches/${branchId}/chapters/`);
+            const chapters = processApiResponse(response);
+            console.log(`📦 Chapters loaded for branch ${branchId}:`, chapters.length);
+            return chapters;
+        } catch (error) {
+            console.error(`Error fetching chapters for branch ${branchId}:`, error);
+            return [];
+        }
+    }, forceRefresh);
 };
 
 // ============================================
 // CHAPTER API FUNCTIONS
 // ============================================
 
-export const fetchChapters = async (branchId = null) => {
+export const fetchChapters = async (branchId = null, forceRefresh = false) => {
     if (USE_MOCK_DATA) {
         await new Promise(resolve => setTimeout(resolve, 200));
         if (branchId) {
@@ -486,22 +646,21 @@ export const fetchChapters = async (branchId = null) => {
     }
 
     const cacheKey = branchId ? `chapters_all_${branchId}` : 'chapters_all';
-    const cached = cache.get(cacheKey);
-    if (cached) return cached;
-
-    try {
-        const params = branchId ? { branch_id: branchId } : {};
-        const response = await apiGet(API_ENDPOINTS.CHAPTERS, params);
-        const chapters = processApiResponse(response);
-        cache.set(cacheKey, chapters);
-        return chapters;
-    } catch (error) {
-        console.error('Error fetching chapters:', error);
-        return [];
-    }
+    
+    return cache.getOrFetch(cacheKey, async () => {
+        try {
+            const params = branchId ? { branch_id: branchId } : {};
+            const response = await apiGet(API_ENDPOINTS.CHAPTERS, params);
+            return processApiResponse(response);
+            
+        } catch (error) {
+            console.error('Error fetching chapters:', error);
+            return [];
+        }
+    }, forceRefresh);
 };
 
-export const fetchChapter = async (chapterId) => {
+export const fetchChapter = async (chapterId, forceRefresh = false) => {
     if (USE_MOCK_DATA) {
         await new Promise(resolve => setTimeout(resolve, 200));
         for (const category of mockCategories) {
@@ -515,16 +674,20 @@ export const fetchChapter = async (chapterId) => {
         return null;
     }
 
-    try {
-        const response = await apiGet(`${API_CONFIG.BASE_URL}chapters/${chapterId}/`);
-        return response.data || response;
-    } catch (error) {
-        console.error(`Error fetching chapter ${chapterId}:`, error);
-        return null;
-    }
+    const cacheKey = `chapter_${chapterId}`;
+    
+    return cache.getOrFetch(cacheKey, async () => {
+        try {
+            const response = await apiGet(`${API_CONFIG.BASE_URL}/chapters/${chapterId}/`);
+            return response.data || response;
+        } catch (error) {
+            console.error(`Error fetching chapter ${chapterId}:`, error);
+            return null;
+        }
+    }, forceRefresh);
 };
 
-export const fetchQuestionsByChapter = async (chapterId) => {
+export const fetchQuestionsByChapter = async (chapterId, forceRefresh = false) => {
     if (USE_MOCK_DATA) {
         await new Promise(resolve => setTimeout(resolve, 400));
         const key = Object.keys(mockQuestions).find(k => k.endsWith(`_${chapterId}`));
@@ -532,25 +695,25 @@ export const fetchQuestionsByChapter = async (chapterId) => {
     }
 
     const cacheKey = `questions_chapter_${chapterId}`;
-    const cached = cache.get(cacheKey);
-    if (cached) return cached;
-
-    try {
-        const response = await apiGet(`${API_CONFIG.BASE_URL}chapters/${chapterId}/questions/`);
-        const questions = processApiResponse(response);
-        cache.set(cacheKey, questions);
-        return questions;
-    } catch (error) {
-        console.error(`Error fetching questions for chapter ${chapterId}:`, error);
-        return [];
-    }
+    
+    return cache.getOrFetch(cacheKey, async () => {
+        try {
+            const response = await apiGet(`${API_CONFIG.BASE_URL}/chapters/${chapterId}/questions/`);
+            const questions = processApiResponse(response);
+            console.log(`📦 Questions loaded for chapter ${chapterId}:`, questions.length);
+            return questions;
+        } catch (error) {
+            console.error(`Error fetching questions for chapter ${chapterId}:`, error);
+            return [];
+        }
+    }, forceRefresh);
 };
 
 // ============================================
 // QUESTION API FUNCTIONS
 // ============================================
 
-export const fetchQuestions = async (categoryId, facultyId, branchId, chapterId) => {
+export const fetchQuestions = async (categoryId, facultyId, branchId, chapterId, forceRefresh = false) => {
     if (USE_MOCK_DATA) {
         await new Promise(resolve => setTimeout(resolve, 400));
         const key = `${categoryId}_${facultyId}_${branchId}_${chapterId}`;
@@ -562,23 +725,27 @@ export const fetchQuestions = async (categoryId, facultyId, branchId, chapterId)
     }
 
     const cacheKey = `questions_${categoryId}_${facultyId}_${branchId}_${chapterId}`;
-    const cached = cache.get(cacheKey);
-    if (cached) return cached;
-
-    try {
-        const response = await apiGet(
-            `${API_CONFIG.BASE_URL}questions/${categoryId}/${facultyId}/${branchId}/${chapterId}/`
-        );
-        const questions = processApiResponse(response);
-        cache.set(cacheKey, questions);
-        return questions;
-    } catch (error) {
-        console.error(`Error fetching questions:`, error);
-        return [];
-    }
+    
+    return cache.getOrFetch(cacheKey, async () => {
+        try {
+            const params = new URLSearchParams();
+            if (categoryId) params.append('category_id', categoryId);
+            if (facultyId) params.append('faculty_id', facultyId);
+            if (branchId) params.append('branch_id', branchId);
+            if (chapterId) params.append('chapter_id', chapterId);
+            
+            const response = await apiGet(`${API_CONFIG.BASE_URL}/questions/?${params.toString()}`);
+            const questions = processApiResponse(response);
+            console.log(`📦 Questions loaded:`, questions.length);
+            return questions;
+        } catch (error) {
+            console.error('Error fetching questions:', error);
+            return [];
+        }
+    }, forceRefresh);
 };
 
-export const fetchAllQuestions = async (chapterId = null) => {
+export const fetchAllQuestions = async (chapterId = null, forceRefresh = false) => {
     if (USE_MOCK_DATA) {
         await new Promise(resolve => setTimeout(resolve, 300));
         if (chapterId) {
@@ -609,7 +776,7 @@ export const fetchAllQuestions = async (chapterId = null) => {
     }
 };
 
-export const fetchQuestion = async (questionId) => {
+export const fetchQuestion = async (questionId, forceRefresh = false) => {
     if (USE_MOCK_DATA) {
         await new Promise(resolve => setTimeout(resolve, 200));
         for (const key of Object.keys(mockQuestions)) {
@@ -619,38 +786,41 @@ export const fetchQuestion = async (questionId) => {
         return null;
     }
 
-    try {
-        const response = await apiGet(`${API_CONFIG.BASE_URL}questions/${questionId}/`);
-        return response.data || response;
-    } catch (error) {
-        console.error(`Error fetching question ${questionId}:`, error);
-        return null;
-    }
+    const cacheKey = `question_${questionId}`;
+    
+    return cache.getOrFetch(cacheKey, async () => {
+        try {
+            const response = await apiGet(`${API_CONFIG.BASE_URL}/questions/${questionId}/`);
+            return response.data || response;
+        } catch (error) {
+            console.error(`Error fetching question ${questionId}:`, error);
+            return null;
+        }
+    }, forceRefresh);
 };
 
 // ============================================
 // FULL HIERARCHY API
 // ============================================
 
-export const fetchFullHierarchy = async () => {
+export const fetchFullHierarchy = async (forceRefresh = false) => {
     if (USE_MOCK_DATA) {
         await new Promise(resolve => setTimeout(resolve, 500));
         return mockCategories;
     }
 
     const cacheKey = 'full_hierarchy';
-    const cached = cache.get(cacheKey);
-    if (cached) return cached;
-
-    try {
-        const response = await apiGet(`${API_CONFIG.BASE_URL}full-hierarchy/`);
-        const data = processApiResponse(response);
-        cache.set(cacheKey, data);
-        return data;
-    } catch (error) {
-        console.error('Error fetching full hierarchy:', error);
-        return [];
-    }
+    
+    return cache.getOrFetch(cacheKey, async () => {
+        try {
+            const response = await apiGet(`${API_CONFIG.BASE_URL}/full-hierarchy/`);
+            return processApiResponse(response);
+            
+        } catch (error) {
+            console.error('Error fetching full hierarchy:', error);
+            return [];
+        }
+    }, forceRefresh);
 };
 
 // ============================================
@@ -676,7 +846,7 @@ export const searchQuestions = async (query) => {
     }
 
     try {
-        const response = await apiGet(`${API_CONFIG.BASE_URL}search/`, { q: query });
+        const response = await apiGet(`${API_CONFIG.BASE_URL}/search/`, { q: query });
         return processApiResponse(response);
     } catch (error) {
         console.error('Error searching questions:', error);
@@ -688,7 +858,7 @@ export const searchQuestions = async (query) => {
 // STATS API
 // ============================================
 
-export const fetchStats = async () => {
+export const fetchStats = async (forceRefresh = false) => {
     if (USE_MOCK_DATA) {
         await new Promise(resolve => setTimeout(resolve, 200));
         return {
@@ -704,30 +874,30 @@ export const fetchStats = async () => {
     }
 
     const cacheKey = 'stats';
-    const cached = cache.get(cacheKey);
-    if (cached) return cached;
-
-    try {
-        const response = await apiGet('/stats/');
-        const data = response.data || response;
-        cache.set(cacheKey, data);
-        return data;
-    } catch (error) {
-        console.error('Error fetching stats:', error);
-        return null;
-    }
+    
+    return cache.getOrFetch(cacheKey, async () => {
+        try {
+            const response = await apiGet('/stats/');
+            return response.data || response;
+            
+        } catch (error) {
+            console.error('Error fetching stats:', error);
+            return null;
+        }
+    }, forceRefresh);
 };
 
 // ============================================
-// CRUD OPERATIONS
+// CRUD OPERATIONS WITH CACHE INVALIDATION
 // ============================================
 
 export const createCategory = async (data) => {
     try {
-        const response = await apiPost(API_ENDPOINTS.CATEGORIES, data);
+        const result = await apiPost(API_ENDPOINTS.CATEGORIES, data);
         cache.clearByPrefix('categories');
+        cache.clearByPrefix('category_');
         cache.clearByPrefix('full_hierarchy');
-        return response.data || response;
+        return result;
     } catch (error) {
         console.error('Error creating category:', error);
         throw error;
@@ -736,11 +906,11 @@ export const createCategory = async (data) => {
 
 export const updateCategory = async (id, data) => {
     try {
-        const response = await apiPut(`/categories/${id}/`, data);
+        const result = await apiPut(`${API_CONFIG.BASE_URL}/categories/${id}/`, data);
+        cache.clearByCategory(id);
         cache.clearByPrefix('categories');
-        cache.clearByPrefix(`category_full_${id}`);
         cache.clearByPrefix('full_hierarchy');
-        return response.data || response;
+        return result;
     } catch (error) {
         console.error(`Error updating category ${id}:`, error);
         throw error;
@@ -749,9 +919,9 @@ export const updateCategory = async (id, data) => {
 
 export const deleteCategory = async (id) => {
     try {
-        await apiDelete(`/categories/${id}/`);
+        await apiDelete(`${API_CONFIG.BASE_URL}/categories/${id}/`);
+        cache.clearByCategory(id);
         cache.clearByPrefix('categories');
-        cache.clearByPrefix(`category_full_${id}`);
         cache.clearByPrefix('full_hierarchy');
         return { success: true };
     } catch (error) {
@@ -762,11 +932,11 @@ export const deleteCategory = async (id) => {
 
 export const createFaculty = async (data) => {
     try {
-        const response = await apiPost(API_ENDPOINTS.FACULTIES, data);
+        const result = await apiPost(API_ENDPOINTS.FACULTIES, data);
         cache.clearByPrefix('faculties');
         cache.clearByPrefix('branches');
         cache.clearByPrefix('full_hierarchy');
-        return response.data || response;
+        return result;
     } catch (error) {
         console.error('Error creating faculty:', error);
         throw error;
@@ -775,11 +945,11 @@ export const createFaculty = async (data) => {
 
 export const updateFaculty = async (id, data) => {
     try {
-        const response = await apiPut(`/faculties/${id}/`, data);
+        const result = await apiPut(`${API_CONFIG.BASE_URL}/faculties/${id}/`, data);
+        cache.clearByFaculty(id);
         cache.clearByPrefix('faculties');
-        cache.clearByPrefix(`faculty_full_${id}`);
         cache.clearByPrefix('full_hierarchy');
-        return response.data || response;
+        return result;
     } catch (error) {
         console.error(`Error updating faculty ${id}:`, error);
         throw error;
@@ -788,9 +958,9 @@ export const updateFaculty = async (id, data) => {
 
 export const deleteFaculty = async (id) => {
     try {
-        await apiDelete(`/faculties/${id}/`);
+        await apiDelete(`${API_CONFIG.BASE_URL}/faculties/${id}/`);
+        cache.clearByFaculty(id);
         cache.clearByPrefix('faculties');
-        cache.clearByPrefix(`faculty_full_${id}`);
         cache.clearByPrefix('full_hierarchy');
         return { success: true };
     } catch (error) {
@@ -801,11 +971,11 @@ export const deleteFaculty = async (id) => {
 
 export const createBranch = async (data) => {
     try {
-        const response = await apiPost(API_ENDPOINTS.BRANCHES, data);
+        const result = await apiPost(API_ENDPOINTS.BRANCHES, data);
         cache.clearByPrefix('branches');
         cache.clearByPrefix('chapters');
         cache.clearByPrefix('full_hierarchy');
-        return response.data || response;
+        return result;
     } catch (error) {
         console.error('Error creating branch:', error);
         throw error;
@@ -814,11 +984,11 @@ export const createBranch = async (data) => {
 
 export const updateBranch = async (id, data) => {
     try {
-        const response = await apiPut(`/branches/${id}/`, data);
+        const result = await apiPut(`${API_CONFIG.BASE_URL}/branches/${id}/`, data);
+        cache.clearByBranch(id);
         cache.clearByPrefix('branches');
-        cache.clearByPrefix(`branch_full_${id}`);
         cache.clearByPrefix('full_hierarchy');
-        return response.data || response;
+        return result;
     } catch (error) {
         console.error(`Error updating branch ${id}:`, error);
         throw error;
@@ -827,9 +997,9 @@ export const updateBranch = async (id, data) => {
 
 export const deleteBranch = async (id) => {
     try {
-        await apiDelete(`/branches/${id}/`);
+        await apiDelete(`${API_CONFIG.BASE_URL}/branches/${id}/`);
+        cache.clearByBranch(id);
         cache.clearByPrefix('branches');
-        cache.clearByPrefix(`branch_full_${id}`);
         cache.clearByPrefix('full_hierarchy');
         return { success: true };
     } catch (error) {
@@ -840,11 +1010,11 @@ export const deleteBranch = async (id) => {
 
 export const createChapter = async (data) => {
     try {
-        const response = await apiPost(API_ENDPOINTS.CHAPTERS, data);
+        const result = await apiPost(API_ENDPOINTS.CHAPTERS, data);
         cache.clearByPrefix('chapters');
         cache.clearByPrefix('questions');
         cache.clearByPrefix('full_hierarchy');
-        return response.data || response;
+        return result;
     } catch (error) {
         console.error('Error creating chapter:', error);
         throw error;
@@ -853,11 +1023,11 @@ export const createChapter = async (data) => {
 
 export const updateChapter = async (id, data) => {
     try {
-        const response = await apiPut(`/chapters/${id}/`, data);
+        const result = await apiPut(`${API_CONFIG.BASE_URL}/chapters/${id}/`, data);
+        cache.clearByChapter(id);
         cache.clearByPrefix('chapters');
-        cache.clearByPrefix(`questions_chapter_${id}`);
         cache.clearByPrefix('full_hierarchy');
-        return response.data || response;
+        return result;
     } catch (error) {
         console.error(`Error updating chapter ${id}:`, error);
         throw error;
@@ -866,9 +1036,9 @@ export const updateChapter = async (id, data) => {
 
 export const deleteChapter = async (id) => {
     try {
-        await apiDelete(`/chapters/${id}/`);
+        await apiDelete(`${API_CONFIG.BASE_URL}/chapters/${id}/`);
+        cache.clearByChapter(id);
         cache.clearByPrefix('chapters');
-        cache.clearByPrefix(`questions_chapter_${id}`);
         cache.clearByPrefix('full_hierarchy');
         return { success: true };
     } catch (error) {
@@ -879,12 +1049,12 @@ export const deleteChapter = async (id) => {
 
 export const createQuestion = async (data) => {
     try {
-        const response = await apiPost(API_ENDPOINTS.QUESTIONS, data);
-        cache.clearByPrefix('questions');
+        const result = await apiPost(API_ENDPOINTS.QUESTIONS, data);
         if (data.chapter) {
-            cache.clearByPrefix(`questions_chapter_${data.chapter}`);
+            cache.clearByChapter(data.chapter);
         }
-        return response.data || response;
+        cache.clearByPrefix('questions');
+        return result;
     } catch (error) {
         console.error('Error creating question:', error);
         throw error;
@@ -893,12 +1063,12 @@ export const createQuestion = async (data) => {
 
 export const updateQuestion = async (id, data) => {
     try {
-        const response = await apiPut(`/questions/${id}/`, data);
-        cache.clearByPrefix('questions');
+        const result = await apiPut(`${API_CONFIG.BASE_URL}/questions/${id}/`, data);
         if (data.chapter) {
-            cache.clearByPrefix(`questions_chapter_${data.chapter}`);
+            cache.clearByChapter(data.chapter);
         }
-        return response.data || response;
+        cache.clearByPrefix('questions');
+        return result;
     } catch (error) {
         console.error(`Error updating question ${id}:`, error);
         throw error;
@@ -907,7 +1077,7 @@ export const updateQuestion = async (id, data) => {
 
 export const deleteQuestion = async (id) => {
     try {
-        await apiDelete(`/questions/${id}/`);
+        await apiDelete(`${API_CONFIG.BASE_URL}/questions/${id}/`);
         cache.clearByPrefix('questions');
         return { success: true };
     } catch (error) {
@@ -917,12 +1087,26 @@ export const deleteQuestion = async (id) => {
 };
 
 // ============================================
-// CACHE MANAGEMENT EXPORTS
+// CACHE MANAGEMENT FUNCTIONS
 // ============================================
 
 export const clearCache = () => cache.clear();
 export const getCacheStats = () => cache.getStats();
 export const clearCacheByPrefix = (prefix) => cache.clearByPrefix(prefix);
+export const clearCacheByCategory = (categoryId) => cache.clearByCategory(categoryId);
+export const clearCacheByFaculty = (facultyId) => cache.clearByFaculty(facultyId);
+export const clearCacheByBranch = (branchId) => cache.clearByBranch(branchId);
+export const clearCacheByChapter = (chapterId) => cache.clearByChapter(chapterId);
+
+// ============================================
+// FORCE REFRESH FUNCTIONS
+// ============================================
+
+export const refreshCategories = () => fetchCategories(true);
+export const refreshFacultiesByCategory = (categoryId) => fetchFacultiesByCategory(categoryId, true);
+export const refreshBranchesByFaculty = (facultyId) => fetchBranchesByFaculty(facultyId, true);
+export const refreshChaptersByBranch = (branchId) => fetchChaptersByBranch(branchId, true);
+export const refreshQuestionsByChapter = (chapterId) => fetchQuestionsByChapter(chapterId, true);
 
 // ============================================
 // DEFAULT EXPORT
@@ -974,5 +1158,18 @@ export default {
     clearCache,
     getCacheStats,
     clearCacheByPrefix,
+    clearCacheByCategory,
+    clearCacheByFaculty,
+    clearCacheByBranch,
+    clearCacheByChapter,
+    
+    // Force Refresh
+    refreshCategories,
+    refreshFacultiesByCategory,
+    refreshBranchesByFaculty,
+    refreshChaptersByBranch,
+    refreshQuestionsByChapter,
+    
+    // Cache instance
     cache,
 };

@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useMCQ, ACTIONS } from '../MCQ_API_Context';
-import { fetchFaculties } from '../MCQ_API_Fetch';
+import { fetchFacultiesByCategory } from '../MCQ_API_Fetch';
 import '../assets/css/MCQ_Faculty.css';
 
 const MCQ_Faculty = () => {
@@ -8,25 +8,25 @@ const MCQ_Faculty = () => {
         categories, 
         selectedCategory,
         dispatch,
-        category
+        category,
+        isLoading
     } = useMCQ();
 
     useEffect(() => {
-        // Fetch faculties for the selected category if not already loaded
         if (selectedCategory && !category?.faculties) {
             const loadFaculties = async () => {
                 dispatch({ type: ACTIONS.SET_LOADING, payload: true });
                 try {
-                    const faculties = await fetchFaculties(selectedCategory);
-                    // Update the category with faculties
+                    const faculties = await fetchFacultiesByCategory(selectedCategory);
                     const updatedCategory = { ...category, faculties };
-                    // Update categories in state
                     const updatedCategories = categories.map(c => 
                         c.id === selectedCategory ? updatedCategory : c
                     );
                     dispatch({ type: ACTIONS.SET_CATEGORIES, payload: updatedCategories });
+                    dispatch({ type: ACTIONS.SET_LOADING, payload: false });
                 } catch (error) {
                     dispatch({ type: ACTIONS.SET_ERROR, payload: error.message });
+                    dispatch({ type: ACTIONS.SET_LOADING, payload: false });
                 }
             };
             loadFaculties();
@@ -41,6 +41,34 @@ const MCQ_Faculty = () => {
         dispatch({ type: ACTIONS.SELECT_CATEGORY, payload: null });
     };
 
+    // Skeleton Loader
+    if (isLoading) {
+        return (
+            <div className="mcq-faculty-container">
+                <div className="mcq-faculty-header">
+                    <div className="mcq-back-btn-skeleton shimmer"></div>
+                    <div className="header-content">
+                        <div className="header-icon-skeleton shimmer"></div>
+                        <div>
+                            <div className="mcq-faculty-title-skeleton shimmer"></div>
+                            <div className="mcq-faculty-subtitle-skeleton shimmer"></div>
+                        </div>
+                    </div>
+                </div>
+                <div className="mcq-faculty-grid">
+                    {[1, 2, 3, 4, 5, 6].map((i) => (
+                        <div key={i} className="mcq-faculty-card skeleton">
+                            <div className="skeleton-icon shimmer"></div>
+                            <div className="skeleton-title shimmer"></div>
+                            <div className="skeleton-desc shimmer"></div>
+                            <div className="skeleton-meta shimmer"></div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        );
+    }
+
     if (!category) {
         return (
             <div className="mcq-faculty-error">
@@ -54,6 +82,19 @@ const MCQ_Faculty = () => {
     }
 
     const faculties = category.faculties || [];
+
+    if (faculties.length === 0) {
+        return (
+            <div className="mcq-faculty-empty">
+                <i className="bi bi-folder-fill"></i>
+                <h3>No faculties available</h3>
+                <p>This category doesn't have any faculties yet.</p>
+                <button onClick={handleBack} className="mcq-back-btn">
+                    <i className="bi bi-arrow-left"></i> Go Back
+                </button>
+            </div>
+        );
+    }
 
     return (
         <div className="mcq-faculty-container">

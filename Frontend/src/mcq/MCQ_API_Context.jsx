@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
+import { fetchCategories, getCacheStats } from './MCQ_API_Fetch';
 
 // ============================================
 // HELPER: Get Initial State from localStorage
@@ -23,7 +24,8 @@ const getInitialState = () => {
                     score: parsed.score || 0,
                     isLoading: true,
                     error: null,
-                    isSubmitting: false
+                    isSubmitting: false,
+                    cacheStats: { hits: 0, misses: 0, hitRate: 0, size: 0 }
                 };
             }
         }
@@ -43,9 +45,10 @@ const getInitialState = () => {
         selectedAnswers: {},
         quizCompleted: false,
         score: 0,
-        isLoading: false,
+        isLoading: true,
         error: null,
-        isSubmitting: false
+        isSubmitting: false,
+        cacheStats: { hits: 0, misses: 0, hitRate: 0, size: 0 }
     };
 };
 
@@ -77,6 +80,7 @@ export const ACTIONS = {
     SET_SUBMITTING: 'SET_SUBMITTING',
     UPDATE_FACULTY: 'UPDATE_FACULTY',
     UPDATE_BRANCH: 'UPDATE_BRANCH',
+    UPDATE_CACHE_STATS: 'UPDATE_CACHE_STATS'
 };
 
 // ============================================
@@ -232,14 +236,13 @@ const mcqReducer = (state, action) => {
 
         case ACTIONS.COMPLETE_QUIZ: {
             const correctCount = state.questions.filter(
-                q => state.selectedAnswers[q.id] === q.correctAnswer
+                q => state.selectedAnswers[q.id] === q.correct_answer
             ).length;
             newState = { ...state, quizCompleted: true, score: correctCount, isSubmitting: false };
             break;
         }
 
         case ACTIONS.RESET_QUIZ:
-            // Keep questions but reset all quiz-related state
             newState = {
                 ...state,
                 currentQuestionIndex: 0,
@@ -249,7 +252,6 @@ const mcqReducer = (state, action) => {
                 isSubmitting: false,
                 error: null,
                 isLoading: false
-                // Keep: questions, selectedChapter, selectedBranch, selectedFaculty, selectedCategory
             };
             break;
 
@@ -317,13 +319,18 @@ const mcqReducer = (state, action) => {
             };
             break;
 
+        case ACTIONS.UPDATE_CACHE_STATS:
+            newState = { ...state, cacheStats: action.payload };
+            break;
+
         default:
             newState = state;
     }
     
     if (action.type !== ACTIONS.SET_LOADING && 
         action.type !== ACTIONS.SET_ERROR && 
-        action.type !== ACTIONS.CLEAR_ERROR) {
+        action.type !== ACTIONS.CLEAR_ERROR &&
+        action.type !== ACTIONS.UPDATE_CACHE_STATS) {
         saveStateToLocalStorage(newState);
     }
     
@@ -341,18 +348,37 @@ const MCQ_API_Context = createContext();
 export const MCQProvider = ({ children }) => {
     const [state, dispatch] = useReducer(mcqReducer, initialState);
 
+    // Update cache stats periodically
+    useEffect(() => {
+        const updateCacheStats = () => {
+            try {
+                const stats = getCacheStats();
+                dispatch({ type: ACTIONS.UPDATE_CACHE_STATS, payload: stats });
+            } catch (e) {
+                // Ignore stats update errors
+            }
+        };
+        
+        updateCacheStats();
+        const interval = setInterval(updateCacheStats, 30000); // Update every 30 seconds
+        
+        return () => clearInterval(interval);
+    }, []);
+
     // Load categories on mount
     useEffect(() => {
         const loadCategories = async () => {
             try {
+                // If categories already loaded, just set loading to false
                 if (state.categories && state.categories.length > 0) {
                     dispatch({ type: ACTIONS.SET_LOADING, payload: false });
                     return;
                 }
                 
+                // Set loading to true before fetching
                 dispatch({ type: ACTIONS.SET_LOADING, payload: true });
                 
-                const { fetchCategories } = await import('./MCQ_API_Fetch');
+                // Use the cached fetch function
                 const data = await fetchCategories();
                 
                 console.log('📦 Categories loaded in context:', data?.length || 0);

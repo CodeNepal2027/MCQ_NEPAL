@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useMCQ, ACTIONS } from '../MCQ_API_Context';
 import { fetchChaptersByBranch, fetchQuestions } from '../MCQ_API_Fetch';
 import '../assets/css/MCQ_Chapter.css';
@@ -16,10 +16,15 @@ const MCQ_Chapter = () => {
         categories
     } = useMCQ();
 
+    // Use a ref to track if chapters are already loaded
+    const chaptersLoadedRef = useRef(false);
+
     // Load chapters if not already loaded
     useEffect(() => {
         const loadChapters = async () => {
-            if (selectedBranch && !branch?.chapters) {
+            // Only load if we have a branch, no chapters, and not already loaded
+            if (selectedBranch && !branch?.chapters && !chaptersLoadedRef.current) {
+                // Set loading to true
                 dispatch({ type: ACTIONS.SET_LOADING, payload: true });
                 try {
                     console.log('📡 Loading chapters for branch:', selectedBranch);
@@ -57,6 +62,8 @@ const MCQ_Chapter = () => {
                         payload: updatedCategories 
                     });
                     
+                    // Mark as loaded
+                    chaptersLoadedRef.current = true;
                     dispatch({ type: ACTIONS.SET_LOADING, payload: false });
                 } catch (error) {
                     console.error('Error loading chapters:', error);
@@ -66,7 +73,12 @@ const MCQ_Chapter = () => {
             }
         };
         loadChapters();
-    }, [selectedBranch, branch, dispatch, faculty, category, selectedCategory, selectedFaculty, categories]);
+    }, [selectedBranch, branch?.chapters, dispatch, faculty, category, selectedCategory, selectedFaculty, categories]);
+
+    // Reset the loaded ref when branch changes
+    useEffect(() => {
+        chaptersLoadedRef.current = false;
+    }, [selectedBranch]);
 
     // Get chapters from branch data
     const chapters = branch?.chapters || [];
@@ -109,11 +121,29 @@ const MCQ_Chapter = () => {
         dispatch({ type: ACTIONS.SELECT_BRANCH, payload: null });
     };
 
+    // Show skeleton loader
     if (isLoading) {
         return (
-            <div className="mcq-chapter-loading">
-                <div className="mcq-loading-spinner"></div>
-                <p>Loading chapters...</p>
+            <div className="mcq-chapter-container">
+                <div className="mcq-chapter-header">
+                    <div className="mcq-back-btn-skeleton shimmer"></div>
+                    <div className="header-content">
+                        <div>
+                            <div className="mcq-chapter-title-skeleton shimmer"></div>
+                            <div className="mcq-chapter-subtitle-skeleton shimmer"></div>
+                        </div>
+                    </div>
+                </div>
+                <div className="mcq-chapter-grid">
+                    {[1, 2, 3, 4, 5, 6].map((i) => (
+                        <div key={i} className="mcq-chapter-card skeleton">
+                            <div className="skeleton-icon shimmer"></div>
+                            <div className="skeleton-title shimmer"></div>
+                            <div className="skeleton-desc shimmer"></div>
+                            <div className="skeleton-meta shimmer"></div>
+                        </div>
+                    ))}
+                </div>
             </div>
         );
     }
@@ -163,28 +193,32 @@ const MCQ_Chapter = () => {
             </div>
 
             <div className="mcq-chapter-grid">
-                {chapters.map((chapter) => (
-                    <div
-                        key={chapter.id}
-                        className="mcq-chapter-card"
-                        onClick={() => handleChapterSelect(chapter.id)}
-                    >
-                        <div className="chapter-icon">
-                            <i className="bi bi-book-fill"></i>
+                {chapters.map((chapter) => {
+                    const questionCount = chapter.questionCount || chapter.questions?.length || 0;
+                    
+                    return (
+                        <div
+                            key={chapter.id}
+                            className="mcq-chapter-card"
+                            onClick={() => handleChapterSelect(chapter.id)}
+                        >
+                            <div className="chapter-icon">
+                                <i className="bi bi-book-fill"></i>
+                            </div>
+                            <h3 className="mcq-chapter-name">{chapter.name}</h3>
+                            <p className="mcq-chapter-desc">{chapter.description}</p>
+                            <div className="mcq-chapter-meta">
+                                <span className="chapter-meta">
+                                    <i className="bi bi-question-circle"></i> 
+                                    {questionCount} Questions
+                                </span>
+                            </div>
+                            <div className="mcq-chapter-start">
+                                Start Practice <i className="bi bi-arrow-right-circle"></i>
+                            </div>
                         </div>
-                        <h3 className="mcq-chapter-name">{chapter.name}</h3>
-                        <p className="mcq-chapter-desc">{chapter.description}</p>
-                        <div className="mcq-chapter-meta">
-                            <span className="chapter-meta">
-                                <i className="bi bi-question-circle"></i> 
-                                {chapter.questionCount || 0} Questions
-                            </span>
-                        </div>
-                        <div className="mcq-chapter-start">
-                            Start Practice <i className="bi bi-arrow-right-circle"></i>
-                        </div>
-                    </div>
-                ))}
+                    );
+                })}
             </div>
 
             <div className="mcq-chapter-footer">
