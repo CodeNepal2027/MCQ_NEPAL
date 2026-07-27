@@ -45,14 +45,14 @@ const Home_Categories = () => {
                             </div>
                             <h3 className="category-name">{category.name}</h3>
                             <p className="category-desc">{category.description}</p>
-                            <Link to="/categories" className="category-link">
+                            <Link to="/mcq" className="category-link">
                                 Explore <i className="bi bi-arrow-right"></i>
                             </Link>
                         </div>
                     ))}
                 </div>
                 <div className="categories-cta">
-                    <Link to="/categories" className="btn-primary">
+                    <Link to="/mcq" className="btn-primary">
                         View All Categories <i className="bi bi-grid-fill"></i>
                     </Link>
                 </div>
