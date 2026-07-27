@@ -14,26 +14,32 @@ const MCQ_Branch = () => {
         categories
     } = useMCQ();
 
-    // Use a ref to track if branches are already loaded
     const branchesLoadedRef = useRef(false);
 
-    // Load branches if not already loaded
     useEffect(() => {
         const loadBranches = async () => {
-            if (selectedFaculty && !faculty?.branches && !branchesLoadedRef.current) {
+            // If faculty doesn't exist, try to find it
+            if (!faculty) {
+                console.warn('Faculty not found in state, trying to reload...');
+                return;
+            }
+            
+            // If branches already exist, don't reload
+            if (faculty.branches && faculty.branches.length > 0) {
+                branchesLoadedRef.current = true;
+                return;
+            }
+            
+            if (selectedFaculty && !branchesLoadedRef.current) {
                 dispatch({ type: ACTIONS.SET_LOADING, payload: true });
                 try {
                     console.log('📡 Loading branches for faculty:', selectedFaculty);
                     const branches = await fetchBranchesByFaculty(selectedFaculty);
-                    console.log('📦 Branches loaded:', branches);
+                    console.log('📦 Branches loaded:', branches.length);
                     
                     const updatedFaculty = { ...faculty, branches };
                     
-                    dispatch({ 
-                        type: ACTIONS.UPDATE_FACULTY, 
-                        payload: { facultyId: selectedFaculty, facultyData: updatedFaculty } 
-                    });
-                    
+                    // Update the faculty in the categories state
                     const updatedCategory = { ...category };
                     const updatedFaculties = updatedCategory.faculties?.map(f => 
                         f.id === selectedFaculty ? updatedFaculty : f
@@ -50,16 +56,19 @@ const MCQ_Branch = () => {
                     });
                     
                     branchesLoadedRef.current = true;
-                    dispatch({ type: ACTIONS.SET_LOADING, payload: false });
                 } catch (error) {
                     console.error('Error loading branches:', error);
                     dispatch({ type: ACTIONS.SET_ERROR, payload: error.message || 'Failed to load branches' });
+                } finally {
                     dispatch({ type: ACTIONS.SET_LOADING, payload: false });
                 }
             }
         };
-        loadBranches();
-    }, [selectedFaculty, faculty?.branches, dispatch, category, selectedCategory, categories]);
+        
+        if (selectedFaculty && faculty) {
+            loadBranches();
+        }
+    }, [selectedFaculty, faculty, dispatch, category, selectedCategory, categories]);
 
     // Reset the loaded ref when faculty changes
     useEffect(() => {
@@ -74,7 +83,6 @@ const MCQ_Branch = () => {
         dispatch({ type: ACTIONS.SELECT_FACULTY, payload: null });
     };
 
-    // Show skeleton loader
     if (isLoading) {
         return (
             <div className="mcq-branch-container">
@@ -106,7 +114,7 @@ const MCQ_Branch = () => {
         return (
             <div className="mcq-branch-error">
                 <i className="bi bi-exclamation-triangle-fill"></i>
-                <p>Faculty not found</p>
+                <p>Faculty not found. Please go back and try again.</p>
                 <button onClick={handleBack} className="mcq-back-btn">
                     <i className="bi bi-arrow-left"></i> Go Back
                 </button>

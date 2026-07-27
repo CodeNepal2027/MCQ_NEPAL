@@ -13,22 +13,39 @@ const MCQ_Faculty = () => {
     } = useMCQ();
 
     useEffect(() => {
-        if (selectedCategory && !category?.faculties) {
-            const loadFaculties = async () => {
-                dispatch({ type: ACTIONS.SET_LOADING, payload: true });
-                try {
-                    const faculties = await fetchFacultiesByCategory(selectedCategory);
-                    const updatedCategory = { ...category, faculties };
-                    const updatedCategories = categories.map(c => 
-                        c.id === selectedCategory ? updatedCategory : c
-                    );
-                    dispatch({ type: ACTIONS.SET_CATEGORIES, payload: updatedCategories });
-                    dispatch({ type: ACTIONS.SET_LOADING, payload: false });
-                } catch (error) {
-                    dispatch({ type: ACTIONS.SET_ERROR, payload: error.message });
-                    dispatch({ type: ACTIONS.SET_LOADING, payload: false });
-                }
-            };
+        const loadFaculties = async () => {
+            // If category doesn't exist in categories, try to find it
+            if (!category) {
+                console.warn('Category not found in state, trying to reload...');
+                return;
+            }
+            
+            // If faculties already exist, don't reload
+            if (category.faculties && category.faculties.length > 0) {
+                return;
+            }
+            
+            dispatch({ type: ACTIONS.SET_LOADING, payload: true });
+            try {
+                const faculties = await fetchFacultiesByCategory(selectedCategory);
+                console.log('📦 Faculties loaded:', faculties.length);
+                
+                // Update the category with faculties
+                const updatedCategory = { ...category, faculties };
+                const updatedCategories = categories.map(c => 
+                    c.id === selectedCategory ? updatedCategory : c
+                );
+                dispatch({ type: ACTIONS.SET_CATEGORIES, payload: updatedCategories });
+            } catch (error) {
+                console.error('Error loading faculties:', error);
+                dispatch({ type: ACTIONS.SET_ERROR, payload: error.message });
+            } finally {
+                dispatch({ type: ACTIONS.SET_LOADING, payload: false });
+            }
+        };
+        
+        // Only load if we have a selected category
+        if (selectedCategory && category) {
             loadFaculties();
         }
     }, [selectedCategory, category, categories, dispatch]);
@@ -41,7 +58,7 @@ const MCQ_Faculty = () => {
         dispatch({ type: ACTIONS.SELECT_CATEGORY, payload: null });
     };
 
-    // Skeleton Loader
+    // Show loading state
     if (isLoading) {
         return (
             <div className="mcq-faculty-container">
@@ -73,7 +90,7 @@ const MCQ_Faculty = () => {
         return (
             <div className="mcq-faculty-error">
                 <i className="bi bi-exclamation-triangle-fill"></i>
-                <p>Category not found</p>
+                <p>Category not found. Please go back and try again.</p>
                 <button onClick={handleBack} className="mcq-back-btn">
                     <i className="bi bi-arrow-left"></i> Go Back
                 </button>

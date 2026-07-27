@@ -366,6 +366,7 @@ export const MCQProvider = ({ children }) => {
     }, []);
 
     // Load categories on mount
+    // Update the loadCategories function in the useEffect
     useEffect(() => {
         const loadCategories = async () => {
             try {
@@ -395,7 +396,7 @@ export const MCQProvider = ({ children }) => {
         };
         
         loadCategories();
-    }, []);
+    }, []); // Empty dependency array - only run once on mount
 
     // Computed Values with safety checks
     const getCurrentQuestion = () => {

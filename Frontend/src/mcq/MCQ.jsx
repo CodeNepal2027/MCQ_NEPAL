@@ -33,41 +33,33 @@ const MCQ = () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    // Load categories on mount - check if we have saved state first
+    // Load categories on mount - ALWAYS ensure categories are loaded first
     useEffect(() => {
         const loadCategories = async () => {
-            // If we already have categories, don't reload
+            // If categories already loaded, just set loading to false
             if (categories.length > 0) {
                 dispatch({ type: ACTIONS.SET_LOADING, payload: false });
                 return;
             }
             
-            // Check if we have a saved selection
-            const savedState = localStorage.getItem('mcq_state');
-            if (savedState) {
-                try {
-                    const parsed = JSON.parse(savedState);
-                    if (parsed.selectedCategory) {
-                        // We have a saved category, but categories are already being loaded by the provider
-                        // Just wait for them
-                        return;
-                    }
-                } catch (e) {
-                    console.warn('Failed to parse saved state:', e);
-                }
-            }
-            
-            // No saved state or no categories, load categories
             dispatch({ type: ACTIONS.SET_LOADING, payload: true });
             setLoadingMessage('Loading categories...');
             
             try {
                 const data = await fetchCategories();
-                dispatch({ type: ACTIONS.SET_CATEGORIES, payload: data });
+                console.log('📦 Categories loaded:', data?.length || 0);
+                
+                const categoriesData = Array.isArray(data) ? data : [];
+                dispatch({ type: ACTIONS.SET_CATEGORIES, payload: categoriesData });
             } catch (error) {
-                dispatch({ type: ACTIONS.SET_ERROR, payload: error.message });
+                console.error('Failed to load categories:', error);
+                dispatch({ 
+                    type: ACTIONS.SET_ERROR, 
+                    payload: 'Failed to load categories. Please try again.' 
+                });
             }
         };
+        
         loadCategories();
     }, [categories.length, dispatch]);
 
@@ -76,8 +68,8 @@ const MCQ = () => {
         scrollToTop();
     }, [selectedCategory, selectedFaculty, selectedBranch, selectedChapter, quizCompleted]);
 
-    // Show loading state - with better handling
-    if (isLoading) {
+    // CRITICAL: Show loading while categories are being loaded
+    if (isLoading && categories.length === 0) {
         return (
             <div className="mcq-loading-container">
                 <div className="mcq-loading-spinner"></div>
@@ -106,6 +98,17 @@ const MCQ = () => {
         );
     }
 
+    // IMPORTANT: Wait for categories to be loaded before rendering
+    if (categories.length === 0) {
+        return (
+            <div className="mcq-loading-container">
+                <div className="mcq-loading-spinner"></div>
+                <p className="mcq-loading-text">Loading categories...</p>
+                <p className="mcq-loading-subtext">Please wait while we prepare your questions</p>
+            </div>
+        );
+    }
+
     // Level 1: Category Selection
     if (!selectedCategory) {
         return <MCQ_Category />;
@@ -126,20 +129,36 @@ const MCQ = () => {
         return <MCQ_Chapter />;
     }
 
-    // Level 5: Quiz
-    if (selectedCategory && selectedFaculty && selectedBranch && selectedChapter && questions.length > 0) {
+    // Level 5: Quiz - Check if questions exist
+    if (selectedCategory && selectedFaculty && selectedBranch && selectedChapter) {
+        // If quiz is completed, show result
         if (quizCompleted) {
             return <MCQ_Result />;
         }
-        return (
-            <div className="mcq-quiz-wrapper">
-                <MCQ_Question />
-                <MCQ_QuestionNav />
-            </div>
-        );
+        
+        // If questions are loaded, show them
+        if (questions && questions.length > 0) {
+            return (
+                <div className="mcq-quiz-wrapper">
+                    <MCQ_Question />
+                    <MCQ_QuestionNav />
+                </div>
+            );
+        }
+        
+        // If still loading questions
+        if (isLoading) {
+            return (
+                <div className="mcq-loading-container">
+                    <div className="mcq-loading-spinner"></div>
+                    <p className="mcq-loading-text">Loading questions...</p>
+                    <p className="mcq-loading-subtext">Getting your practice questions ready</p>
+                </div>
+            );
+        }
     }
 
-    // No questions found
+    // No questions found - show empty state
     return (
         <div className="mcq-empty-container">
             <div className="mcq-empty-icon">
