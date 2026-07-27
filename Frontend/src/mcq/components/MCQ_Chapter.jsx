@@ -16,22 +16,29 @@ const MCQ_Chapter = () => {
         categories
     } = useMCQ();
 
-    // Use a ref to track if chapters are already loaded
     const chaptersLoadedRef = useRef(false);
 
-    // Load chapters if not already loaded
     useEffect(() => {
         const loadChapters = async () => {
-            // Only load if we have a branch, no chapters, and not already loaded
-            if (selectedBranch && !branch?.chapters && !chaptersLoadedRef.current) {
-                // Set loading to true
+            // If branch doesn't exist, try to find it
+            if (!branch) {
+                console.warn('Branch not found in state, trying to reload...');
+                return;
+            }
+            
+            // If chapters already exist, don't reload
+            if (branch.chapters && branch.chapters.length > 0) {
+                chaptersLoadedRef.current = true;
+                return;
+            }
+            
+            if (selectedBranch && !chaptersLoadedRef.current) {
                 dispatch({ type: ACTIONS.SET_LOADING, payload: true });
                 try {
                     console.log('📡 Loading chapters for branch:', selectedBranch);
                     const chapters = await fetchChaptersByBranch(selectedBranch);
-                    console.log('📦 Chapters loaded:', chapters);
+                    console.log('📦 Chapters loaded:', chapters.length);
                     
-                    // Update the branch with chapters
                     const updatedBranch = { ...branch, chapters };
                     
                     // Update the branch in the categories state
@@ -51,43 +58,33 @@ const MCQ_Chapter = () => {
                         c.id === selectedCategory ? updatedCategory : c
                     );
                     
-                    // Dispatch both updates
-                    dispatch({ 
-                        type: ACTIONS.UPDATE_BRANCH, 
-                        payload: { branchId: selectedBranch, branchData: updatedBranch } 
-                    });
-                    
                     dispatch({ 
                         type: ACTIONS.SET_CATEGORIES, 
                         payload: updatedCategories 
                     });
                     
-                    // Mark as loaded
                     chaptersLoadedRef.current = true;
-                    dispatch({ type: ACTIONS.SET_LOADING, payload: false });
                 } catch (error) {
                     console.error('Error loading chapters:', error);
                     dispatch({ type: ACTIONS.SET_ERROR, payload: error.message || 'Failed to load chapters' });
+                } finally {
                     dispatch({ type: ACTIONS.SET_LOADING, payload: false });
                 }
             }
         };
-        loadChapters();
-    }, [selectedBranch, branch?.chapters, dispatch, faculty, category, selectedCategory, selectedFaculty, categories]);
+        
+        if (selectedBranch && branch) {
+            loadChapters();
+        }
+    }, [selectedBranch, branch, dispatch, faculty, category, selectedCategory, selectedFaculty, categories]);
 
-    // Reset the loaded ref when branch changes
     useEffect(() => {
         chaptersLoadedRef.current = false;
     }, [selectedBranch]);
 
-    // Get chapters from branch data
-    const chapters = branch?.chapters || [];
-
     const handleChapterSelect = async (chapterId) => {
-        // Set the selected chapter
         dispatch({ type: ACTIONS.SELECT_CHAPTER, payload: chapterId });
         
-        // Fetch questions for this chapter
         dispatch({ type: ACTIONS.SET_LOADING, payload: true });
         try {
             console.log('Fetching questions for chapter:', chapterId);
@@ -109,10 +106,10 @@ const MCQ_Chapter = () => {
                     payload: 'No questions available for this chapter' 
                 });
             }
-            dispatch({ type: ACTIONS.SET_LOADING, payload: false });
         } catch (error) {
             console.error('Error fetching questions:', error);
             dispatch({ type: ACTIONS.SET_ERROR, payload: error.message || 'Failed to load questions' });
+        } finally {
             dispatch({ type: ACTIONS.SET_LOADING, payload: false });
         }
     };
@@ -121,7 +118,6 @@ const MCQ_Chapter = () => {
         dispatch({ type: ACTIONS.SELECT_BRANCH, payload: null });
     };
 
-    // Show skeleton loader
     if (isLoading) {
         return (
             <div className="mcq-chapter-container">
@@ -152,13 +148,15 @@ const MCQ_Chapter = () => {
         return (
             <div className="mcq-chapter-error">
                 <i className="bi bi-exclamation-triangle-fill"></i>
-                <p>Branch not found</p>
+                <p>Branch not found. Please go back and try again.</p>
                 <button onClick={handleBack} className="mcq-back-btn">
                     <i className="bi bi-arrow-left"></i> Go Back
                 </button>
             </div>
         );
     }
+
+    const chapters = branch.chapters || [];
 
     if (chapters.length === 0) {
         return (
